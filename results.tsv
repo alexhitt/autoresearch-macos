@@ -10,3 +10,4 @@ cca1f67	0.000000	0.0	crash	DEVICE_BATCH_SIZE=32 OOM at step 0 - MPS 14.09GB + 2G
 3ddf4ed	1.796721	0.0	keep	WINDOW_PATTERN SLSL (65 steps) - 3.25x throughput, val_bpb 2.067->1.797 BEST
 e840fce	2.142264	0.0	discard	ASPECT_RATIO 96 (16 steps, 19.7M params) - wider but slower, worse than 1.797
 a942c55	1.999127	0.0	discard	TOTAL_BATCH_SIZE 2**15 (48 steps) - half batch fewer steps, worse than 1.797
+a69f558	1.999399	0.0	discard	WARMDOWN_RATIO 0.3 (29 steps) - less warmdown didn't help, worse than 1.797
