@@ -7,3 +7,4 @@ d4a61b6	0.000000	0.0	crash	DEPTH=6 OOM at step 10 - MPS allocated 15.55GB + 1.76
 4e34976	2.092843	0.0	discard	MATRIX_LR 0.04->0.08 (22 steps) - worse than baseline best 2.067
 cca1f67	0.000000	0.0	crash	DEVICE_BATCH_SIZE=32 OOM at step 0 - MPS 14.09GB + 2GB alloc exceeded 18.13GB
 953ca0d	2.179501	0.0	discard	WARMUP_RATIO 0.0->0.1 (24 steps) - warmup wastes steps, worse than baseline 2.067
+3ddf4ed	1.796721	0.0	keep	WINDOW_PATTERN SLSL (65 steps) - 3.25x throughput, val_bpb 2.067->1.797 BEST
