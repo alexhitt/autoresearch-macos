@@ -12,3 +12,4 @@ e840fce	2.142264	0.0	discard	ASPECT_RATIO 96 (16 steps, 19.7M params) - wider bu
 a942c55	1.999127	0.0	discard	TOTAL_BATCH_SIZE 2**15 (48 steps) - half batch fewer steps, worse than 1.797
 a69f558	1.999399	0.0	discard	WARMDOWN_RATIO 0.3 (29 steps) - less warmdown didn't help, worse than 1.797
 c0e234c	2.039939	0.0	discard	WINDOW_PATTERN SSSS (23 steps) - all-short worse than SLSL, worse than 1.797
+adc010e	2.024003	0.0	discard	WEIGHT_DECAY 0.0 (26 steps) - no regularization, worse than 1.797
