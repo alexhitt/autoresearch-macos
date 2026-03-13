@@ -1,1 +1,6 @@
 commit	val_bpb	memory_gb	status	description
+dca17aa	2.128328	0.0	keep	baseline run 1 - unmodified train.py (15 steps)
+dca17aa	2.081314	0.0	keep	baseline run 2 - unmodified train.py (19 steps)
+dca17aa	2.066789	0.0	keep	baseline run 3 - unmodified train.py (20 steps)
+dca17aa	0.000000	0.0	crash	DEPTH=8 OOM - MPS allocated 16.32GB exceeded 18.13GB limit
+d4a61b6	0.000000	0.0	crash	DEPTH=6 OOM at step 10 - MPS allocated 15.55GB + 1.76GB exceeded 18.13GB limit
