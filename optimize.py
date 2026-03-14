@@ -162,7 +162,7 @@ Return ONLY the complete Python hyperparameter block starting with the marker co
 No explanation, no markdown fences. Just the code."""
 
     result = subprocess.run(
-        ["claude", "--print", "--model", "sonnet", "-p", prompt],
+        ["claude", "--print", "--model", "opus", "-p", prompt],
         capture_output=True,
         text=True,
         timeout=300,
@@ -174,10 +174,40 @@ No explanation, no markdown fences. Just the code."""
     response = result.stdout.strip()
 
     # Strip markdown fences if present
-    if response.startswith("```"):
+    if "```" in response:
         lines = response.split("\n")
         lines = [l for l in lines if not l.startswith("```")]
         response = "\n".join(lines)
+
+    # Strip any non-code text the LLM may have included.
+    # Find the marker comment that starts the block; discard everything before it.
+    marker_idx = response.find("# Hyperparameters (edit these directly")
+    if marker_idx > 0:
+        response = response[marker_idx:]
+
+    # Find the closing separator; discard everything after it.
+    # The block ends with a line of dashes.
+    closing = response.rfind("# ----")
+    if closing == -1:
+        closing = response.rfind("# -----")
+    if closing != -1:
+        # Keep through the end of that line
+        end_of_line = response.find("\n", closing)
+        if end_of_line != -1:
+            response = response[:end_of_line + 1]
+
+    # Final safety: remove any lines that aren't comments, assignments,
+    # blank lines, or the separator. This catches stray prose.
+    clean_lines = []
+    for line in response.split("\n"):
+        stripped = line.strip()
+        if (stripped == "" or
+            stripped.startswith("#") or
+            "=" in stripped or
+            stripped.startswith("WINDOW_PATTERN") or
+            stripped.startswith("ADAM_BETAS")):
+            clean_lines.append(line)
+    response = "\n".join(clean_lines)
 
     return response
 
@@ -227,7 +257,7 @@ def main():
     args = parser.parse_args()
 
     print("Direct Hyperparameter Optimizer")
-    print(f"  LLM: claude --print --model sonnet (Max sub, $0)")
+    print(f"  LLM: claude --print --model opus (Max sub, $0)")
     print(f"  Max iterations: {args.max_iters}")
     print(f"  Baseline val_bpb: {BASELINE_VAL_BPB}")
     print(f"  Est. time: ~{args.max_iters * 10} min ({args.max_iters} iters × ~10 min)")
