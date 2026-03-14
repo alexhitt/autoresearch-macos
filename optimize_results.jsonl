@@ -1,0 +1,4 @@
+{"iter": 1, "val_bpb": 2.058986, "steps": 42, "wall_time": 652.8, "kept": false, "delta_pct": 35.73, "error": null}
+{"iter": 2, "val_bpb": 2.035424, "steps": 45, "wall_time": 637.4, "kept": false, "delta_pct": 34.17, "error": null}
+{"iter": 3, "val_bpb": 2.078065, "steps": 40, "wall_time": 641.0, "kept": false, "delta_pct": 36.99, "error": null}
+{"iter": 4, "val_bpb": 2.054206, "steps": 42, "wall_time": 658.8, "kept": false, "delta_pct": 35.41, "error": null}

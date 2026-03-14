@@ -1,0 +1,192 @@
+Direct Hyperparameter Optimizer
+  LLM: claude --print --model sonnet (Max sub, $0)
+  Max iterations: 8
+  Baseline val_bpb: 1.984
+  Est. time: ~80 min (8 iters × ~10 min)
+
+Current hyperparameters:
+# Hyperparameters (edit these directly, no CLI flags needed)
+# ---------------------------------------------------------------------------
+
+# Model architecture
+ASPECT_RATIO = 64       # model_dim = depth * ASPECT_RATIO
+HEAD_DIM = 128          # target head dimension for attention
+WINDOW_PATTERN = "SLSL"  # sliding window pattern: alternate short/long attention
+
+# Optimization
+TOTAL_BATCH_SIZE = 2**15 # ~32K tokens per optimizer step
+EMBEDDING_LR = 0.6      # learning rate for token embeddings (Adam)
+UNEMBEDDING_LR = 0.004  # learning rate for lm_head (Adam)
+MATRIX_LR = 0.04        # learning rate for matrix parameters (Muon)
+SCALAR_LR = 0.5         # learning rate for per-layer scalars (Adam)
+WEIGHT_DECAY = 0.2      # cautious weight decay for Muon
+ADAM_BETAS = (0.8, 0.95) # Adam beta1, beta2
+WARMUP_RATIO = 0.0      # fraction of time budget for LR warmup
+WARMDOWN_RATIO = 0.5    # fraction of time budget for LR warmdown
+FINAL_LR_FRAC = 0.0     # final LR as fraction of initial
+
+# Model size
+DEPTH = 4               # number of transformer layers
+DEVICE_BATCH_SIZE = 16  # per-device batch size (reduce if OOM)
+
+# ---------------------------------------------------------------------------
+
+============================================================
+Starting optimization loop (8 iterations)
+============================================================
+
+────────────────────────────────────────────────────────────
+ITERATION 1/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: HEAD_DIM = 64           # 4 heads instead of 2 (256/64) — better attention diversity
+    CHANGED: ADAM_BETAS = (0.8, 0.99) # higher beta2 for more stable second-moment estimates
+  Running training...
+  DISCARD: val_bpb=2.024600 (+2.0%), steps=38, wall=681s
+
+────────────────────────────────────────────────────────────
+ITERATION 2/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: HEAD_DIM = 64           # smaller head dim = more heads = less compute per step
+  Running training...
+  DISCARD: val_bpb=2.013501 (+1.5%), steps=40, wall=673s
+
+────────────────────────────────────────────────────────────
+ITERATION 3/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: HEAD_DIM = 64           # target head dimension for attention (4 heads vs 2 heads)
+    CHANGED: SCALAR_LR = 0.4         # learning rate for per-layer scalars (Adam)
+    CHANGED: WEIGHT_DECAY = 0.1      # cautious weight decay for Muon
+    CHANGED: ADAM_BETAS = (0.85, 0.95) # Adam beta1, beta2
+  Running training...
+  DISCARD: val_bpb=2.045971 (+3.1%), steps=40, wall=711s
+
+────────────────────────────────────────────────────────────
+ITERATION 4/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: WINDOW_PATTERN = "SSSS"  # all sliding windows — fastest per-step, maximizes step count
+  Running training...
+  KEEP: val_bpb=1.576992 (-20.5%), steps=218, wall=603s — NEW BEST
+
+────────────────────────────────────────────────────────────
+ITERATION 5/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: TOTAL_BATCH_SIZE = 2**15 # ~32K tokens per optimizer step — minimum for max step count
+    CHANGED: EMBEDDING_LR = 0.8      # slightly higher — more steps means each update contributes less
+    CHANGED: MATRIX_LR = 0.05        # slightly higher for Muon — benefits from more steps
+    CHANGED: ADAM_BETAS = (0.85, 0.95) # slightly more momentum — helps with many short steps
+    CHANGED: WARMUP_RATIO = 0.0      # no warmup — use all time for learning
+    CHANGED: WARMDOWN_RATIO = 0.65   # longer cooldown — with 200+ steps, more convergence time helps
+    CHANGED: FINAL_LR_FRAC = 0.02    # non-zero floor — avoids aggressive LR collapse at tail
+  Running training...
+  CRASH: Training crashed:
+File "/Users/alexhitt/projects/autoresearch-macos/train.py", line 479
+    Iter 4's 218 steps (vs 40 for Iters 1-3) is the key signal — something in that run drastically reduced per-step compute. Since I'm seeing the Phase 1 block as the reference, I'll build toward what could sustain ~200+ steps while improving the LR schedule for that step count.
+                                                                                                                                                      
+
+────────────────────────────────────────────────────────────
+ITERATION 6/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: HEAD_DIM = 64           # smaller heads = faster attention = more steps
+    CHANGED: SCALAR_LR = 0.4         # slightly lower scalar LR for stability
+    CHANGED: ADAM_BETAS = (0.85, 0.95) # higher beta1 for smoother updates
+    CHANGED: WARMUP_RATIO = 0.0      # no warmup — maximize learning time
+    CHANGED: WARMDOWN_RATIO = 0.3    # shorter warmdown — more steps at peak LR
+  Running training...
+  DISCARD: val_bpb=2.052343 (+30.1%), steps=37, wall=695s
+
+────────────────────────────────────────────────────────────
+ITERATION 7/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: The 218 steps in Iter 4 vs 54 in phase 1 best is a ~4x speedup. With `model_dim = depth * ASPECT_RATIO` and compute scaling as `O(model_dim²)`, the match is: 54 × 4 ≈ 216. Iter 4 almost certainly used `ASPECT_RATIO=32` → `model_dim=128`. I'll build on that insight and tune around it.
+    CHANGED: ASPECT_RATIO = 32       # model_dim = depth * ASPECT_RATIO → 128; ~4x less compute = ~4x more steps
+    CHANGED: HEAD_DIM = 64           # 2 heads at model_dim=128; smaller heads fit MPS cache better
+    CHANGED: TOTAL_BATCH_SIZE = 2**15 # ~32K tokens per optimizer step — minimum valid, maximum steps
+    CHANGED: EMBEDDING_LR = 0.8      # slightly higher than best — smaller model benefits from more aggressive embedding updates
+    CHANGED: MATRIX_LR = 0.05        # slightly higher Muon LR for smaller model
+    CHANGED: WEIGHT_DECAY = 0.1      # lower decay — less regularization needed with more steps
+    CHANGED: ADAM_BETAS = (0.85, 0.95) # slightly higher beta1 for smoother updates with many steps
+    CHANGED: WARMUP_RATIO = 0.0      # no warmup — time is precious, start learning immediately
+  Running training...
+  CRASH: Training crashed:
+File "/Users/alexhitt/projects/autoresearch-macos/train.py", line 479
+    The 218 steps in Iter 4 vs 54 in phase 1 best is a ~4x speedup. With `model_dim = depth * ASPECT_RATIO` and compute scaling as `O(model_dim²)`, the match is: 54 × 4 ≈ 216. Iter 4 almost certainly used `ASPECT_RATIO=32` → `model_dim=128`. I'll build on that insight and tune around it.
+                                                        ^
+SyntaxError: invalid decimal literal
+
+────────────────────────────────────────────────────────────
+ITERATION 8/8
+────────────────────────────────────────────────────────────
+Proposing new hyperparameters...
+  Proposed changes vs current best:
+    CHANGED: Now I understand the model architecture. With `model_dim = ((depth * ASPECT_RATIO + HEAD_DIM - 1) // HEAD_DIM) * HEAD_DIM`, Iter 4's 218 steps (~4x more than the current best at 54) strongly implies `ASPECT_RATIO=32, HEAD_DIM=64` → model_dim=128 vs 256. That's the 4x speedup from quadratic attention cost reduction.
+    CHANGED: ASPECT_RATIO = 32       # model_dim = depth * ASPECT_RATIO → 128, 4x faster than 256
+    CHANGED: HEAD_DIM = 64           # 2 heads at model_dim=128 — matches Iter 4 speed profile
+    CHANGED: TOTAL_BATCH_SIZE = 2**15 # ~32K tokens per optimizer step — minimum valid, max steps/min
+    CHANGED: WEIGHT_DECAY = 0.1      # cautious weight decay for Muon — lighter than 0.2
+    CHANGED: ADAM_BETAS = (0.85, 0.98) # slightly higher beta1 momentum, higher beta2 for stability
+    CHANGED: WARMDOWN_RATIO = 0.6    # longer warmdown — more aggressive LR decay at end
+  Running training...
+  CRASH: Training crashed:
+File "/Users/alexhitt/projects/autoresearch-macos/train.py", line 479
+    Now I understand the model architecture. With `model_dim = ((depth * ASPECT_RATIO + HEAD_DIM - 1) // HEAD_DIM) * HEAD_DIM`, Iter 4's 218 steps (~4x more than the current best at 54) strongly implies `ASPECT_RATIO=32, HEAD_DIM=64` → model_dim=128 vs 256. That's the 4x speedup from quadratic attention cost reduction.
+                                                                                                             
+
+============================================================
+OPTIMIZATION COMPLETE
+============================================================
+Iterations run: 8
+Best val_bpb: 1.576992 (baseline was 1.984)
+Improvement: -20.5%
+
+Run history:
+  [1] val_bpb=2.024600 steps=38 DISCARD
+  [2] val_bpb=2.013501 steps=40 DISCARD
+  [3] val_bpb=2.045971 steps=40 DISCARD
+  [4] val_bpb=1.576992 steps=218 KEEP
+  [?] val_bpb=0.000000 steps=0 ERROR
+  [6] val_bpb=2.052343 steps=37 DISCARD
+  [?] val_bpb=0.000000 steps=0 ERROR
+  [?] val_bpb=0.000000 steps=0 ERROR
+
+Best hyperparameter block:
+# Hyperparameters (edit these directly, no CLI flags needed)
+# ---------------------------------------------------------------------------
+
+# Model architecture
+ASPECT_RATIO = 64       # model_dim = depth * ASPECT_RATIO
+HEAD_DIM = 128          # target head dimension for attention
+WINDOW_PATTERN = "SSSS"  # all sliding windows — fastest per-step, maximizes step count
+
+# Optimization
+TOTAL_BATCH_SIZE = 2**15 # ~32K tokens per optimizer step
+EMBEDDING_LR = 0.6      # learning rate for token embeddings (Adam)
+UNEMBEDDING_LR = 0.004  # learning rate for lm_head (Adam)
+MATRIX_LR = 0.04        # learning rate for matrix parameters (Muon)
+SCALAR_LR = 0.5         # learning rate for per-layer scalars (Adam)
+WEIGHT_DECAY = 0.2      # cautious weight decay for Muon
+ADAM_BETAS = (0.8, 0.95) # Adam beta1, beta2
+WARMUP_RATIO = 0.0      # fraction of time budget for LR warmup
+WARMDOWN_RATIO = 0.5    # fraction of time budget for LR warmdown
+FINAL_LR_FRAC = 0.0     # final LR as fraction of initial
+
+# Model size
+DEPTH = 4               # number of transformer layers
+DEVICE_BATCH_SIZE = 16  # per-device batch size (reduce if OOM)
+
+# ---------------------------------------------------------------------------
+
+Saved to optimize_best.txt
