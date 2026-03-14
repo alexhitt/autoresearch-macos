@@ -17,3 +17,6 @@ df7db47	2.031753	0.0	discard	EMBEDDING_LR 1.2 (24 steps) - 2x embedding LR, wors
 75eb83a	0.000000	0.0	crash	DEPTH=12 OOM - instant crash at first forward pass, 15.67GB + 1.5GB alloc
 a6490f7	2.011760	0.0	keep	SLSL confirmation run (27 steps) - real-world load, still beats baseline 2.067
 933162c	2.050687	0.0	keep	baseline "L" confirmation under load (22 steps) - apples-to-apples comparison
+7503ce9	1.983801	0.0	keep	RETEST: SLSL + BATCH 2^15 under load (54 steps) - NEW BEST, -3.3% vs baseline
+7503ce9	2.001268	0.0	keep	RETEST: SLSL + WARMDOWN 0.3 under load (28 steps) - beats SLSL alone
+73b6eda	2.001476	0.0	discard	COMBO: SLSL + BATCH 2^15 + WARMDOWN 0.3 (47 steps) - doesn't stack, worse than batch alone
