@@ -48,7 +48,8 @@ PHASE 1 RESULTS (22 runs, sorted by val_bpb):
 
 KEY INSIGHT: On MPS with fixed 5-min time budget, throughput is everything.
 More steps = lower val_bpb. The only wins came from reducing per-step compute
-(sliding windows, smaller batch size). LR tuning had marginal effects.
+(sliding windows). LR tuning had marginal effects.
+NOTE: TOTAL_BATCH_SIZE minimum is 2**15 (32768). Smaller values crash.
 """
 
 
@@ -81,7 +82,7 @@ def inject_hyperparam_block(new_block):
 
 
 def validate_hyperparams(block):
-    """Safety checks — prevent OOM crashes."""
+    """Safety checks — prevent OOM and assertion crashes."""
     depth_match = re.search(r'DEPTH\s*=\s*(\d+)', block)
     if not depth_match or int(depth_match.group(1)) != 4:
         return False, "DEPTH must be 4 (OOM otherwise)"
@@ -89,6 +90,16 @@ def validate_hyperparams(block):
     batch_match = re.search(r'DEVICE_BATCH_SIZE\s*=\s*(\d+)', block)
     if not batch_match or int(batch_match.group(1)) != 16:
         return False, "DEVICE_BATCH_SIZE must be 16 (OOM otherwise)"
+
+    # TOTAL_BATCH_SIZE must be a multiple of tokens_per_fwdbwd (DEVICE_BATCH_SIZE * 2048 = 32768)
+    total_batch_match = re.search(r'TOTAL_BATCH_SIZE\s*=\s*(.+?)(?:\s*#|$)', block, re.MULTILINE)
+    if total_batch_match:
+        try:
+            total_batch = eval(total_batch_match.group(1).strip())
+            if total_batch % 32768 != 0:
+                return False, f"TOTAL_BATCH_SIZE ({total_batch}) must be multiple of 32768 (DEVICE_BATCH_SIZE * SEQ_LEN)"
+        except Exception:
+            return False, "Could not parse TOTAL_BATCH_SIZE"
 
     if "import " in block:
         return False, "Cannot add imports"
@@ -120,13 +131,13 @@ def propose(current_block, history):
 The ONLY metric is val_bpb (validation bits per byte) — LOWER is better.
 Training runs for exactly 5 minutes wall clock on Apple M2 Pro (MPS backend).
 
-HARD CONSTRAINTS (violations = OOM crash):
-- DEPTH must be 4
-- DEVICE_BATCH_SIZE must be 16
+HARD CONSTRAINTS (violations = crash):
+- DEPTH must be 4 (OOM otherwise)
+- DEVICE_BATCH_SIZE must be 16 (OOM otherwise)
+- TOTAL_BATCH_SIZE must be a MULTIPLE of 32768 (= DEVICE_BATCH_SIZE * SEQ_LEN). Minimum is 2**15=32768. Valid values: 2**15, 2**16, 3*2**15, 2**17, etc. Values like 2**14 or 2**13 CRASH.
 - Do NOT add new imports or code — ONLY hyperparameter assignments
 
 SOFT CONSTRAINTS:
-- TOTAL_BATCH_SIZE should be a power of 2
 - All learning rates must be positive floats
 - WARMUP_RATIO + WARMDOWN_RATIO <= 1.0
 - WINDOW_PATTERN is a string of 'S' and 'L' characters (length = DEPTH)
@@ -140,10 +151,12 @@ CURRENT BEST HYPERPARAMETERS (val_bpb={BASELINE_VAL_BPB}):
 Propose a NEW set of hyperparameters that you think will achieve LOWER val_bpb.
 Think about what hasn't been tried yet. Consider:
 - Different WINDOW_PATTERN combinations (SLLS, LSSL, SSLS, etc.)
-- Smaller TOTAL_BATCH_SIZE (2**14 or 2**13) for more steps
+- TOTAL_BATCH_SIZE = 2**16 or 2**17 (larger batch, fewer but bigger steps)
 - Fine-tuning learning rates together (not just one at a time)
 - Different ADAM_BETAS values
 - WARMDOWN_RATIO + FINAL_LR_FRAC combinations
+- HEAD_DIM changes (64 instead of 128)
+- SCALAR_LR adjustments
 
 Return ONLY the complete Python hyperparameter block starting with the marker comment.
 No explanation, no markdown fences. Just the code."""
@@ -152,7 +165,7 @@ No explanation, no markdown fences. Just the code."""
         ["claude", "--print", "--model", "sonnet", "-p", prompt],
         capture_output=True,
         text=True,
-        timeout=120,
+        timeout=300,
     )
 
     if result.returncode != 0:
