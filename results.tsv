@@ -15,3 +15,4 @@ c0e234c	2.039939	0.0	discard	WINDOW_PATTERN SSSS (23 steps) - all-short worse th
 adc010e	2.024003	0.0	discard	WEIGHT_DECAY 0.0 (26 steps) - no regularization, worse than 1.797
 df7db47	2.031753	0.0	discard	EMBEDDING_LR 1.2 (24 steps) - 2x embedding LR, worse than 1.797
 75eb83a	0.000000	0.0	crash	DEPTH=12 OOM - instant crash at first forward pass, 15.67GB + 1.5GB alloc
+a6490f7	2.011760	0.0	keep	SLSL confirmation run (27 steps) - real-world load, still beats baseline 2.067
