@@ -26,12 +26,14 @@ RESULTS_FILE = os.path.join(os.path.dirname(__file__), "optimize_results.jsonl")
 HYPERPARAM_MARKER_START = "# Hyperparameters (edit these directly"
 HYPERPARAM_MARKER_END = "# Setup: tokenizer, model, optimizer, dataloader"
 
-BASELINE_VAL_BPB = 1.984  # Best Phase 1 result under real load
+BASELINE_VAL_BPB = 1.517  # Best result: SSSS + BATCH 2^15 (verified)
 
 # Phase 1 history for the proposer's context
 PHASE1_HISTORY = """
-PHASE 1 RESULTS (22 runs, sorted by val_bpb):
-- SLSL + BATCH 2^15: val_bpb=1.984, 54 steps — BEST under load
+PRIOR RESULTS (sorted by val_bpb):
+- SSSS + BATCH 2^15: val_bpb=1.517, 251 steps — CURRENT BEST (verified)
+- SSSS + BATCH 2^15: val_bpb=1.577, 218 steps — first discovery run
+- SLSL + BATCH 2^15: val_bpb=1.984, 54 steps — old best under load
 - SLSL + WARMDOWN 0.3: val_bpb=2.001, 28 steps
 - SLSL + BATCH 2^15 + WARMDOWN 0.3: val_bpb=2.001, 47 steps — doesn't stack
 - SLSL only: val_bpb=2.012, 27 steps
