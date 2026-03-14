@@ -201,10 +201,13 @@ def evaluator(candidate):
         steps_match = re.search(r'^num_steps:\s+(\d+)', output, re.MULTILINE)
 
         if not bpb_match:
-            # Crash — extract error
+            # Crash — extract error and log full output for debugging
             error_lines = output.strip().split('\n')[-10:]
             error_msg = '\n'.join(error_lines)
-            print(f"CRASH: {error_msg[:200]}")
+            print(f"CRASH: {error_msg[:500]}")
+            print(f"  returncode: {result.returncode}")
+            print(f"  stdout (last 300): ...{result.stdout[-300:]}" if result.stdout else "  stdout: (empty)")
+            print(f"  stderr (last 300): ...{result.stderr[-300:]}" if result.stderr else "  stderr: (empty)")
             return -10.0, {
                 "error": error_msg[:500],
                 "val_bpb": 0.0,
@@ -265,7 +268,8 @@ def main():
     print(f"  LLM: claude --print (Max subscription, $0 extra)")
     print(f"  Max iterations: {args.max_iters}")
     print(f"  Baseline val_bpb: {BASELINE_VAL_BPB}")
-    print(f"  Est. total time: ~{args.max_iters * 20} minutes")
+    print(f"  Max metric calls: {args.max_iters * 3}")
+    print(f"  Est. total time: ~{args.max_iters * 10} minutes")
     print()
 
     # Extract current hyperparameter block as seed
@@ -284,7 +288,7 @@ def main():
     # Configure GEPA
     config = GEPAConfig(
         engine=EngineConfig(
-            max_metric_calls=args.max_iters,
+            max_metric_calls=args.max_iters * 3,  # ~3 evals per iteration (subsample + full)
             run_dir="gepa_runs",
             capture_stdio=True,
         ),
@@ -310,11 +314,27 @@ def main():
     print("\n" + "=" * 60)
     print("GEPA OPTIMIZATION COMPLETE")
     print("=" * 60)
-    print(f"Best score: {result.best_score:.6f} (val_bpb = {-result.best_score:.6f})")
-    print(f"Iterations completed: {result.num_metric_calls}")
+
+    best_idx = result.best_idx
+    best_val_score = result.val_aggregate_scores[best_idx]
+    best_val_bpb = -best_val_score  # un-negate
+
+    print(f"Best candidate index: {best_idx}")
+    print(f"Best val_bpb: {best_val_bpb:.6f} (score: {best_val_score:.6f})")
+    print(f"Total candidates explored: {result.num_candidates}")
+    print(f"Total metric calls: {result.total_metric_calls}")
+    print(f"vs baseline (1.984): {((best_val_bpb - BASELINE_VAL_BPB) / BASELINE_VAL_BPB) * 100:+.1f}%")
     print()
-    print("Best hyperparameter block:")
+
+    # Print all candidate scores
+    print("All candidates:")
+    for i, score in enumerate(result.val_aggregate_scores):
+        marker = " <-- BEST" if i == best_idx else ""
+        print(f"  [{i}] val_bpb={-score:.6f} (score={score:.6f}){marker}")
+    print()
+
     best = result.best_candidate
+    print("Best hyperparameter block:")
     if isinstance(best, dict):
         for v in best.values():
             print(v)
@@ -328,6 +348,8 @@ def main():
                 f.write(v + "\n")
         else:
             f.write(str(best) + "\n")
+        f.write(f"\n# Best val_bpb: {best_val_bpb:.6f}\n")
+        f.write(f"# vs baseline: {((best_val_bpb - BASELINE_VAL_BPB) / BASELINE_VAL_BPB) * 100:+.1f}%\n")
 
     print(f"\nBest candidate saved to gepa_best.txt")
 
