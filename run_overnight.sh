@@ -2,7 +2,6 @@
 # Overnight hyperparameter optimization — run on idle machine for reliable data.
 # Usage: nohup bash run_overnight.sh > overnight.log 2>&1 &
 
-set -e
 cd "$(dirname "$0")"
 
 TRAIN_PY="train.py"
@@ -27,7 +26,7 @@ run_experiment() {
     echo "Run $RUN_NUM: $desc"
     echo "Time: $(date +%H:%M:%S)"
 
-    uv run train.py > "$logfile" 2>&1
+    uv run train.py > "$logfile" 2>&1 || true
 
     local bpb=$(grep "^val_bpb:" "$logfile" | awk '{print $2}')
     local steps=$(grep "^num_steps:" "$logfile" | awk '{print $2}')
@@ -36,9 +35,10 @@ run_experiment() {
     echo "  val_bpb=$bpb, steps=$steps"
 
     if [ -z "$bpb" ]; then
-        echo "  CRASH"
+        echo "  CRASH — restoring baseline and continuing"
         echo -e "${commit}\t0.000000\t0.0\tcrash\tovernight: $desc" >> "$RESULTS"
-        return 1
+        restore_baseline
+        return 0
     fi
 
     # Compare using awk (bash can't do float comparison)
