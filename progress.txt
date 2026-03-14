@@ -1,13 +1,13 @@
 Last session: 2026-03-14
-Built: Phase 1 complete - 13 experiment runs (3 baseline + 10 experimental)
-In progress: Nothing - Phase 1 done
-Blocked: Nothing
-Next: Phase 2 - Use GEPA generalization mode to optimize program.md
-Phase: Phase 1 complete, Phase 2 next
-
-Results:
-- Best val_bpb: 1.797 (WINDOW_PATTERN=SLSL, 65 steps) vs baseline 2.067
-- Only 1/10 experiments improved over baseline
-- M2 Pro ceiling: DEPTH=4, BATCH=16 (11.5M params max)
-- Key insight: throughput > architecture on fixed time budgets
-- Full results in results.tsv, analysis in observations.md
+Last tool: claude-code
+Built: Phase 2 optimization loop (optimize.py)
+  - GEPA abandoned (wrong architecture for expensive evals)
+  - Built direct propose/eval/keep loop using claude --print
+  - SSSS + BATCH 2^15 = new best: val_bpb=1.517, 251 steps (-23.5%)
+  - Verified with second run: consistent
+  - 12 optimizer iterations (Sonnet + Opus): no improvement beyond SSSS
+  - HEAD_DIM=64 always kills throughput (250→42 steps)
+In progress: Handing to Codex for LR/schedule tuning on SSSS baseline
+Blocked: nothing
+Next: Codex runs autonomous loop, constrained to LR/schedule only
+Phase: Phase 2 optimization
