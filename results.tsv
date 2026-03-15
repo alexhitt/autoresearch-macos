@@ -40,3 +40,13 @@ dd6e92d	1.432118	0.0	discard	validation: ASPECT_RATIO=24 (smaller model)
 dd6e92d	1.446698	0.0	discard	validation: ASPECT_RATIO=16 (quarter model size)
 dd6e92d	1.427679	0.0	discard	validation: ADAM_BETAS=(0.9,0.99) on ASPECT_RATIO=32
 dd6e92d	1.415411	0.0	keep	validation: MATRIX_LR=0.06 on ASPECT_RATIO=32
+96b7f37	1.419939	0.0	keep	sweep2: MATRIX_LR=0.09
+96b7f37	1.429894	0.0	discard	sweep2: MATRIX_LR=0.12
+96b7f37	1.420382	0.0	discard	sweep2: MATRIX_LR=0.06 + ADAM_BETAS=(0.9,0.99)
+96b7f37	1.418589	0.0	keep	sweep2: WARMDOWN_RATIO=0.2 on new config
+96b7f37	1.413607	0.0	keep	sweep2: WARMDOWN_RATIO=0.4 on new config
+96b7f37	1.415038	0.0	discard	sweep2: EMBEDDING_LR=0.8 on new config
+96b7f37	1.413931	0.0	discard	sweep2: MATRIX_LR=0.045 (interpolate 0.03-0.06)
+96b7f37	1.414914	0.0	discard	sweep2: FINAL_LR_FRAC=0.1 on new config
+96b7f37	1.413163	0.0	keep	sweep3: WARMDOWN_RATIO=0.5
+96b7f37	1.413610	0.0	discard	sweep3: WARMDOWN_RATIO=0.6

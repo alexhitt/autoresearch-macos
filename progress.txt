@@ -1,9 +1,9 @@
 Last session: 2026-03-15
 Last tool: claude-code
-Built: Validation complete. MATRIX_LR=0.06 new global best val_bpb=1.415 (20.2% improvement over baseline).
-  Config: SLSL + ASPECT_RATIO=32 + MATRIX_LR=0.06 + WARMDOWN_RATIO=0.3 + FINAL_LR_FRAC=0.05
-  Key insight: HPs that lost on AR=64 can win on AR=32 (model-size-dependent optima)
-In progress: run_sweep2.sh ready — 8 runs chasing MATRIX_LR trend + combos
+Built: Sweep3 complete. WARMDOWN_RATIO peak found at 0.5 (val_bpb=1.413163). WR=0.6 regressed (1.413610).
+  Config: SLSL + ASPECT_RATIO=32 + MATRIX_LR=0.06 + WARMDOWN_RATIO=0.5 + FINAL_LR_FRAC=0.05
+  Full trend: 0.2→0.3→0.4→0.5 improved, 0.6 regressed. Peak confirmed.
+In progress: Nothing running
 Blocked: Nothing
-Next: Run sweep2 on idle machine, then `cat sweep2.log`
-Phase: Phase 3 — second sweep after validation confirmed MATRIX_LR=0.06
+Next: HP search exhausted for this model size. 31.6% improvement over baseline (2.067→1.413). Next lever: scale up model or training budget.
+Phase: Optimization complete — sweep3 confirmed peak
