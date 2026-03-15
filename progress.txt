@@ -1,9 +1,9 @@
 Last session: 2026-03-15
 Last tool: claude-code
-Built: Sweep3 complete. WARMDOWN_RATIO peak found at 0.5 (val_bpb=1.413163). WR=0.6 regressed (1.413610).
+Built: Sweep3 complete. Best val_bpb=1.413163 (WR=0.5). WR 0.4-0.6 statistically equivalent (delta within MPS noise).
   Config: SLSL + ASPECT_RATIO=32 + MATRIX_LR=0.06 + WARMDOWN_RATIO=0.5 + FINAL_LR_FRAC=0.05
-  Full trend: 0.2→0.3→0.4→0.5 improved, 0.6 regressed. Peak confirmed.
+  Validated by DeepThink adversarial + validation sessions. 31.6% valid for fixed-budget context.
 In progress: Nothing running
 Blocked: Nothing
-Next: HP search exhausted for this model size. 31.6% improvement over baseline (2.067→1.413). Next lever: scale up model or training budget.
-Phase: Optimization complete — sweep3 confirmed peak
+Next: Converged on local optimum within tested params. v2 improvements: decouple time vs step budgets, clean-slate baselines, adaptive N-testing, env controls (psutil), explore BLOCK_SIZE (MAX_SEQ_LEN in prepare.py).
+Phase: v1 optimization complete — publish content, then iterate v2 methodology
