@@ -20,3 +20,14 @@ a6490f7	2.011760	0.0	keep	SLSL confirmation run (27 steps) - real-world load, st
 7503ce9	1.983801	0.0	keep	RETEST: SLSL + BATCH 2^15 under load (54 steps) - NEW BEST, -3.3% vs baseline
 7503ce9	2.001268	0.0	keep	RETEST: SLSL + WARMDOWN 0.3 under load (28 steps) - beats SLSL alone
 73b6eda	2.001476	0.0	discard	COMBO: SLSL + BATCH 2^15 + WARMDOWN 0.3 (47 steps) - doesn't stack, worse than batch alone
+b4f57a5	2.012719	0.0	discard	SSSS + BATCH 2^15 + MATRIX_LR 0.03 + WARMDOWN 0.6 + FINAL_LR_FRAC 0.05 (39 steps) - fails 200-step gate
+7095dde	1.773308	0.0	keep	overnight: SSSS baseline control (no changes)
+7095dde	1.588125	0.0	keep	overnight: SLSL control (compare window patterns)
+7095dde	1.547697	0.0	keep	overnight: WARMDOWN_RATIO=0.7
+7095dde	1.496470	0.0	keep	overnight: WARMDOWN_RATIO=0.3
+7095dde	1.477957	0.0	keep	overnight: FINAL_LR_FRAC=0.05
+7095dde	1.448529	0.0	keep	overnight: MATRIX_LR=0.03
+7095dde	1.465390	0.0	discard	overnight: MATRIX_LR=0.06
+7095dde	1.525430	0.0	discard	overnight: EMBEDDING_LR=0.8
+7095dde	1.462536	0.0	discard	overnight: ADAM_BETAS=(0.9,0.99)
+7095dde	1.426608	0.0	keep	overnight: ASPECT_RATIO=32 (half model size)

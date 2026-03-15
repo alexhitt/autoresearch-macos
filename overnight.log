@@ -1,0 +1,60 @@
+=== OVERNIGHT OPTIMIZATION ===
+Started: Sun Mar 15 02:39:28 +07 2026
+Machine should be idle for reliable step counts (200+)
+
+────────────────────────────────────────
+Run 1: SSSS baseline control (no changes)
+Time: 02:39:28
+  val_bpb=1.773308, steps=118
+  KEEP — new best!
+────────────────────────────────────────
+Run 2: SLSL control (compare window patterns)
+Time: 02:48:39
+  val_bpb=1.588125, steps=203
+  KEEP — new best!
+────────────────────────────────────────
+Run 3: WARMDOWN_RATIO=0.7
+Time: 02:57:43
+  val_bpb=1.547697, steps=253
+  KEEP — new best!
+────────────────────────────────────────
+Run 4: WARMDOWN_RATIO=0.3
+Time: 03:06:50
+  val_bpb=1.496470, steps=258
+  KEEP — new best!
+────────────────────────────────────────
+Run 5: FINAL_LR_FRAC=0.05
+Time: 03:15:55
+  val_bpb=1.477957, steps=271
+  KEEP — new best!
+────────────────────────────────────────
+Run 6: MATRIX_LR=0.03
+Time: 03:24:58
+  val_bpb=1.448529, steps=268
+  KEEP — new best!
+────────────────────────────────────────
+Run 7: MATRIX_LR=0.06
+Time: 03:34:01
+  val_bpb=1.465390, steps=231
+  DISCARD
+────────────────────────────────────────
+Run 8: EMBEDDING_LR=0.8
+Time: 03:43:07
+  val_bpb=1.525430, steps=220
+  DISCARD
+────────────────────────────────────────
+Run 9: ADAM_BETAS=(0.9,0.99)
+Time: 03:52:16
+  val_bpb=1.462536, steps=268
+  DISCARD
+────────────────────────────────────────
+Run 10: ASPECT_RATIO=32 (half model size)
+Time: 04:01:37
+  val_bpb=1.426608, steps=523
+  KEEP — new best!
+
+=== OVERNIGHT COMPLETE ===
+Finished: Sun Mar 15 04:09:02 +07 2026
+Best val_bpb: 1.426608
+Results appended to results.tsv
+Logs in run_overnight_*.log
