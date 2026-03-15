@@ -1,9 +1,9 @@
 Last session: 2026-03-15
 Last tool: claude-code
-Built: Overnight greedy sweep (10 runs) completed. Best val_bpb=1.427 (19.5% improvement).
-  Final config: SLSL + WARMDOWN_RATIO=0.3 + FINAL_LR_FRAC=0.05 + MATRIX_LR=0.03 + ASPECT_RATIO=32
-  Key finding: ASPECT_RATIO=32 (half model) got best bpb AND 4.4x throughput (523 steps)
-In progress: run_validation.sh — 9 runs, 4 phases (variance, baseline rerun, smaller models, retest discards)
+Built: Validation complete. MATRIX_LR=0.06 new global best val_bpb=1.415 (20.2% improvement over baseline).
+  Config: SLSL + ASPECT_RATIO=32 + MATRIX_LR=0.06 + WARMDOWN_RATIO=0.3 + FINAL_LR_FRAC=0.05
+  Key insight: HPs that lost on AR=64 can win on AR=32 (model-size-dependent optima)
+In progress: run_sweep2.sh ready — 8 runs chasing MATRIX_LR trend + combos
 Blocked: Nothing
-Next: Run validation script on idle machine, then analyze results with `cat validation.log`
-Phase: Phase 2 — validation and exploration after overnight sweep
+Next: Run sweep2 on idle machine, then `cat sweep2.log`
+Phase: Phase 3 — second sweep after validation confirmed MATRIX_LR=0.06
