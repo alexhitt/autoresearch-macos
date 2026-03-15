@@ -1,0 +1,69 @@
+=== VALIDATION + EXPLORATION ===
+Started: Sun Mar 15 11:27:25 +07 2026
+Machine should be idle for reliable step counts (200+)
+
+
+=== PHASE A: Validate current best (3 runs) ===
+
+────────────────────────────────────────
+Run 1: current best — validation run 1/3
+Time: 11:27:25
+  val_bpb=1.423480, steps=536
+  NEW GLOBAL BEST!
+────────────────────────────────────────
+Run 2: current best — validation run 2/3
+Time: 11:34:47
+  val_bpb=1.423537, steps=536
+  (best so far: 1.423480)
+────────────────────────────────────────
+Run 3: current best — validation run 3/3
+Time: 11:42:11
+  val_bpb=1.427999, steps=517
+  (best so far: 1.423480)
+
+=== PHASE B: Original SSSS baseline rerun (2 runs) ===
+
+────────────────────────────────────────
+Run 4: original SSSS baseline — rerun 1/2
+Time: 11:49:35
+  val_bpb=1.577246, steps=214
+  (best so far: 1.423480)
+────────────────────────────────────────
+Run 5: original SSSS baseline — rerun 2/2
+Time: 11:59:15
+  val_bpb=1.961142, steps=58
+  (best so far: 1.423480)
+
+=== PHASE C: Push ASPECT_RATIO further (2 runs) ===
+
+────────────────────────────────────────
+Run 6: ASPECT_RATIO=24 (smaller model)
+Time: 12:09:36
+  val_bpb=1.432118, steps=500
+  (best so far: 1.423480)
+────────────────────────────────────────
+Run 7: ASPECT_RATIO=16 (quarter model size)
+Time: 12:16:58
+  val_bpb=1.446698, steps=447
+  (best so far: 1.423480)
+
+=== PHASE D: Revisit discards on smaller model (2 runs) ===
+
+────────────────────────────────────────
+Run 8: ADAM_BETAS=(0.9,0.99) on ASPECT_RATIO=32
+Time: 12:24:23
+  val_bpb=1.427679, steps=539
+  (best so far: 1.423480)
+────────────────────────────────────────
+Run 9: MATRIX_LR=0.06 on ASPECT_RATIO=32
+Time: 12:31:44
+  val_bpb=1.415411, steps=539
+  NEW GLOBAL BEST!
+
+New best config found — restoring it.
+
+=== VALIDATION COMPLETE ===
+Finished: Sun Mar 15 12:39:04 +07 2026
+Best val_bpb: 1.415411
+Results appended to results.tsv
+Logs in run_validation_*.log

@@ -31,3 +31,12 @@ b4f57a5	2.012719	0.0	discard	SSSS + BATCH 2^15 + MATRIX_LR 0.03 + WARMDOWN 0.6 +
 7095dde	1.525430	0.0	discard	overnight: EMBEDDING_LR=0.8
 7095dde	1.462536	0.0	discard	overnight: ADAM_BETAS=(0.9,0.99)
 7095dde	1.426608	0.0	keep	overnight: ASPECT_RATIO=32 (half model size)
+dd6e92d	1.423480	0.0	keep	validation: current best — validation run 1/3
+dd6e92d	1.423537	0.0	discard	validation: current best — validation run 2/3
+dd6e92d	1.427999	0.0	discard	validation: current best — validation run 3/3
+dd6e92d	1.577246	0.0	discard	validation: original SSSS baseline — rerun 1/2
+dd6e92d	1.961142	0.0	discard	validation: original SSSS baseline — rerun 2/2
+dd6e92d	1.432118	0.0	discard	validation: ASPECT_RATIO=24 (smaller model)
+dd6e92d	1.446698	0.0	discard	validation: ASPECT_RATIO=16 (quarter model size)
+dd6e92d	1.427679	0.0	discard	validation: ADAM_BETAS=(0.9,0.99) on ASPECT_RATIO=32
+dd6e92d	1.415411	0.0	keep	validation: MATRIX_LR=0.06 on ASPECT_RATIO=32
