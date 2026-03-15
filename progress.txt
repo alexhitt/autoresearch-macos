@@ -1,13 +1,9 @@
-Last session: 2026-03-14
+Last session: 2026-03-15
 Last tool: claude-code
-Built: Phase 2 optimization loop (optimize.py)
-  - GEPA abandoned (wrong architecture for expensive evals)
-  - Built direct propose/eval/keep loop using claude --print
-  - SSSS + BATCH 2^15 = new best: val_bpb=1.517, 251 steps (-23.5%)
-  - Verified with second run: consistent
-  - 12 optimizer iterations (Sonnet + Opus): no improvement beyond SSSS
-  - HEAD_DIM=64 always kills throughput (250→42 steps)
-In progress: Handing to Codex for LR/schedule tuning on SSSS baseline
-Blocked: nothing
-Next: Codex runs autonomous loop, constrained to LR/schedule only
-Phase: Phase 2 optimization
+Built: Overnight greedy sweep (10 runs) completed. Best val_bpb=1.427 (19.5% improvement).
+  Final config: SLSL + WARMDOWN_RATIO=0.3 + FINAL_LR_FRAC=0.05 + MATRIX_LR=0.03 + ASPECT_RATIO=32
+  Key finding: ASPECT_RATIO=32 (half model) got best bpb AND 4.4x throughput (523 steps)
+In progress: run_validation.sh — 9 runs, 4 phases (variance, baseline rerun, smaller models, retest discards)
+Blocked: Nothing
+Next: Run validation script on idle machine, then analyze results with `cat validation.log`
+Phase: Phase 2 — validation and exploration after overnight sweep
