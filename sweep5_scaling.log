@@ -1,0 +1,42 @@
+=== SWEEP 5: Time-Optimal Scaling Law Validation (T=30min) ===
+Started: Mon Mar 16 18:54:08 +07 2026
+Testing: AR=16, 24, 32, 64 at TIME_BUDGET=1800s
+Prediction (Session 28): AR=64 wins at 30min
+Current 5min best: 1.413163 (AR=32 + SLSL + LR=0.06 + WR=0.5)
+
+────────────────────────────────────────
+Run 1: AR=16 + SLSL + LR=0.06 (smallest model, most steps)
+Time: 18:54:08
+  val_bpb=1.302762, steps=2982
+────────────────────────────────────────
+Run 2: AR=24 + SLSL + LR=0.06 (narrow model)
+Time: 19:26:44
+  val_bpb=1.306547, steps=2813
+────────────────────────────────────────
+Run 3: AR=32 + SLSL + LR=0.06 (5min champion — control)
+Time: 19:59:19
+  val_bpb=1.307125, steps=2785
+────────────────────────────────────────
+Run 4: AR=64 + SLSL + LR=0.06 (Session 28 predicted winner)
+Time: 20:31:56
+  val_bpb=1.335552, steps=523
+
+────────────────────────────────────────
+SWEEP 5 RESULTS SUMMARY (T=30min)
+────────────────────────────────────────
+
+Configs restored to original (TIME_BUDGET=300s, AR=32).
+
+=== SWEEP 5 COMPLETE ===
+Finished: Mon Mar 16 21:06:30 +07 2026
+
+Scaling law validation checklist:
+  [ ] Did AR=64 beat AR=32? (Session 28 predicts YES)
+  [ ] Is the ranking AR=64 > AR=32 > AR=24 > AR=16? (cubic prediction)
+  [ ] Does AR=16 hit the Amdahl floor? (Session 27 prediction)
+
+If AR=64 wins: scaling law VALIDATED at two timescales → publish
+If AR=32 still wins: overhead-bound regime extends further than predicted
+
+Results appended to results.tsv
+Logs in run_sweep5_*.log

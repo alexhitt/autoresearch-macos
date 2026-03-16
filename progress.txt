@@ -1,9 +1,9 @@
-Last session: 2026-03-15
+Last session: 2026-03-16
 Last tool: claude-code
-Built: Sweep3 complete. Best val_bpb=1.413163 (WR=0.5). WR 0.4-0.6 statistically equivalent (delta within MPS noise).
-  Config: SLSL + ASPECT_RATIO=32 + MATRIX_LR=0.06 + WARMDOWN_RATIO=0.5 + FINAL_LR_FRAC=0.05
-  Validated by DeepThink adversarial + validation sessions. 31.6% valid for fixed-budget context.
-In progress: Nothing running
-Blocked: Nothing
-Next: Converged on local optimum within tested params. v2 improvements: decouple time vs step budgets, clean-slate baselines, adaptive N-testing, env controls (psutil), explore BLOCK_SIZE (MAX_SEQ_LEN in prepare.py).
-Phase: v1 optimization complete — publish content, then iterate v2 methodology
+Built: Sweep5 ran but results CONTAMINATED — machine not idle during run.
+  AR=64 got only 523 steps in 30min (should be ~3000+). Systematic bias against GPU-heavy models.
+  All 4 results marked contaminated in results.tsv.
+In progress: Sweep5 re-run queued for idle machine
+Blocked: Needs idle machine (close all apps, especially Chrome/GPU-using apps)
+Next: Re-run sweep5 on idle machine. Close everything except Terminal. Then validate scaling law.
+Phase: v1 optimization complete — scaling law validation pending clean re-run

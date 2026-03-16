@@ -50,3 +50,10 @@ dd6e92d	1.415411	0.0	keep	validation: MATRIX_LR=0.06 on ASPECT_RATIO=32
 96b7f37	1.414914	0.0	discard	sweep2: FINAL_LR_FRAC=0.1 on new config
 96b7f37	1.413163	0.0	keep	sweep3: WARMDOWN_RATIO=0.5
 96b7f37	1.413610	0.0	discard	sweep3: WARMDOWN_RATIO=0.6
+b0ee99e	1.419216	0.0	keep	sweep4: Candidate 1: Narrow+Aggressive (AR=24, SLSL, LR=0.09, WR=0.4)
+b0ee99e	1.571103	0.0	keep	sweep4: Candidate 2: Slow+Deep (AR=64, L, BATCH=2^16, LR=0.06, WR=0.6)
+b0ee99e	1.458259	0.0	keep	sweep4: Candidate 3: High-Freq Extremist (AR=16, SSSS, BATCH=2^16, LR=0.12, EMBED=1.2)
+b0ee99e	1.302762	0.0	contaminated	sweep5-30min: AR=16 + SLSL + LR=0.06 (smallest model, most steps) [GPU contention — machine not idle]
+b0ee99e	1.306547	0.0	contaminated	sweep5-30min: AR=24 + SLSL + LR=0.06 (narrow model) [GPU contention — machine not idle]
+b0ee99e	1.307125	0.0	contaminated	sweep5-30min: AR=32 + SLSL + LR=0.06 (5min champion — control) [GPU contention — machine not idle]
+b0ee99e	1.335552	0.0	contaminated	sweep5-30min: AR=64 + SLSL + LR=0.06 (Session 28 predicted winner) [GPU contention — AR=64 got 523 steps in 30min, catastrophic]
