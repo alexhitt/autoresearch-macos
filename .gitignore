@@ -20,3 +20,4 @@ AGENTS.md
 dev/
 run*.log
 HANDOFF.md
+sweep*.log
