@@ -57,3 +57,7 @@ b0ee99e	1.302762	0.0	contaminated	sweep5-30min: AR=16 + SLSL + LR=0.06 (smallest
 b0ee99e	1.306547	0.0	contaminated	sweep5-30min: AR=24 + SLSL + LR=0.06 (narrow model) [GPU contention — machine not idle]
 b0ee99e	1.307125	0.0	contaminated	sweep5-30min: AR=32 + SLSL + LR=0.06 (5min champion — control) [GPU contention — machine not idle]
 b0ee99e	1.335552	0.0	contaminated	sweep5-30min: AR=64 + SLSL + LR=0.06 (Session 28 predicted winner) [GPU contention — AR=64 got 523 steps in 30min, catastrophic]
+3363664	1.302169	0.0	keep	sweep5-30min: AR=16 + SLSL + LR=0.06 (smallest model, most steps)
+3363664	1.302028	0.0	keep	sweep5-30min: AR=24 + SLSL + LR=0.06 (narrow model)
+3363664	1.303853	0.0	keep	sweep5-30min: AR=32 + SLSL + LR=0.06 (5min champion — control)
+3363664	1.264936	0.0	keep	sweep5-30min: AR=64 + SLSL + LR=0.06 (Session 28 predicted winner) NEW BEST

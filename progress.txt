@@ -1,9 +1,11 @@
-Last session: 2026-03-16
+Last session: 2026-03-17
 Last tool: claude-code
-Built: Sweep5 ran but results CONTAMINATED — machine not idle during run.
-  AR=64 got only 523 steps in 30min (should be ~3000+). Systematic bias against GPU-heavy models.
-  All 4 results marked contaminated in results.tsv.
-In progress: Sweep5 re-run queued for idle machine
-Blocked: Needs idle machine (close all apps, especially Chrome/GPU-using apps)
-Next: Re-run sweep5 on idle machine. Close everything except Terminal. Then validate scaling law.
-Phase: v1 optimization complete — scaling law validation pending clean re-run
+Built: Sweep5 clean re-run complete. Scaling law VALIDATED.
+  AR=64 wins at T=30min (val_bpb=1.264936). New overall best.
+  38.8% improvement over baseline (2.067). 10.5% over 5-min best (1.413163).
+  AR=16/24/32 plateau at Amdahl floor (~1.302-1.304).
+  GPU contention bias confirmed: AR=64 was 0.071 bpb worse in contaminated run.
+In progress: Nothing — optimization and scaling law validation both complete
+Blocked: Nothing
+Next: Publish content (scaling law validated at two timescales). Consider v2 improvements.
+Phase: v1 complete — scaling law validated, ready for content/publication
