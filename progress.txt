@@ -1,11 +1,11 @@
 Last session: 2026-03-17
 Last tool: claude-code
-Built: Sweep5 clean re-run complete. Scaling law VALIDATED.
-  AR=64 wins at T=30min (val_bpb=1.264936). New overall best.
-  38.8% improvement over baseline (2.067). 10.5% over 5-min best (1.413163).
-  AR=16/24/32 plateau at Amdahl floor (~1.302-1.304).
-  GPU contention bias confirmed: AR=64 was 0.071 bpb worse in contaminated run.
-In progress: Nothing — optimization and scaling law validation both complete
-Blocked: Nothing
-Next: Publish content (scaling law validated at two timescales). Consider v2 improvements.
-Phase: v1 complete — scaling law validated, ready for content/publication
+Built: Sweep5 clean re-run complete. AR=64 wins at T=30min (val_bpb=1.264936).
+  CORRECTED: HEAD_DIM=128 quantization means AR=16/24/32 are IDENTICAL models
+  (all → model_dim=128, 1 head, 5.0M). Sweep5 tested 2 distinct models, not 4.
+  "Scaling law" overclaimed. Crossover between 5M and 11.5M model IS real.
+In progress: Sweep6 script ready — tests 4 distinct model sizes
+Blocked: Needs idle machine for sweep6 (~3.5 hours)
+Next: Run sweep6 (AR=32,64,96,128 → model_dim=128,256,384,512) at T=5min + T=30min.
+  If 3+ sizes survive OOM → real scaling law testable.
+Phase: v1 optimization complete — proper scaling law validation via sweep6
