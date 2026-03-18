@@ -36,6 +36,21 @@ RUN_NUM=0
 # Track which AR values survive Phase 1
 SURVIVED_AR=()
 
+# macOS doesn't have GNU timeout — pure bash replacement
+run_with_timeout() {
+    local secs="$1"
+    shift
+    "$@" &
+    local pid=$!
+    ( sleep "$secs" && kill "$pid" 2>/dev/null ) &
+    local watchdog=$!
+    wait "$pid" 2>/dev/null
+    local rc=$?
+    kill "$watchdog" 2>/dev/null
+    wait "$watchdog" 2>/dev/null
+    return $rc
+}
+
 echo "=== SWEEP 6: Proper Scaling Law — 4 Distinct Model Sizes ==="
 echo "Started: $(date)"
 echo "Testing: AR=32,64,96,128 → model_dim=128,256,384,512"
@@ -82,7 +97,7 @@ run_experiment() {
         timeout_sec=3300  # 55 min max (30 train + 25 eval)
     fi
 
-    timeout "$timeout_sec" uv run train.py > "$logfile" 2>&1 || true
+    run_with_timeout "$timeout_sec" uv run train.py > "$logfile" 2>&1 || true
 
     local bpb=$(grep "^val_bpb:" "$logfile" 2>/dev/null | awk '{print $2}')
     local steps=$(grep "^num_steps:" "$logfile" 2>/dev/null | awk '{print $2}')
@@ -130,13 +145,24 @@ done
 
 echo "────────────────────────────────────────"
 echo "PHASE 1 COMPLETE"
-echo "Survivors: ${SURVIVED_AR[*]}"
+echo "Survivors: ${SURVIVED_AR[*]:-none}"
 echo "────────────────────────────────────────"
 echo ""
 
-if [ ${#SURVIVED_AR[@]} -lt 3 ]; then
-    echo "WARNING: Only ${#SURVIVED_AR[@]} configs survived. Need 3+ for scaling law."
+SURVIVED_COUNT=${#SURVIVED_AR[@]}
+if [ "$SURVIVED_COUNT" -lt 3 ]; then
+    echo "WARNING: Only $SURVIVED_COUNT configs survived. Need 3+ for scaling law."
     echo "Consider testing intermediate AR values (e.g., AR=80 → model_dim=384 with fewer params)."
+fi
+
+if [ "$SURVIVED_COUNT" -eq 0 ]; then
+    echo "No survivors — skipping Phase 2."
+    cp "$TRAIN_PY.sweep6_backup" "$TRAIN_PY"
+    cp "$PREPARE_PY.sweep6_backup" "$PREPARE_PY"
+    rm -f "$TRAIN_PY.sweep6_backup" "$PREPARE_PY.sweep6_backup"
+    echo "=== SWEEP 6 COMPLETE (all crashed) ==="
+    echo "Finished: $(date)"
+    exit 1
 fi
 
 # ══════════════════════════════════════════════════════════════
@@ -174,7 +200,7 @@ echo "SWEEP 6 RESULTS SUMMARY"
 echo "════════════════════════════════════════════════════════════"
 echo ""
 echo "Configs restored to original."
-echo "Survivors: ${SURVIVED_AR[*]}"
+echo "Survivors: ${SURVIVED_AR[*]:-none}"
 echo ""
 echo "Scaling law validation checklist:"
 echo "  [ ] How many distinct model sizes survived? (need 3+ for curve fitting)"
