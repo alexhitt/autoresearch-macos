@@ -23,3 +23,11 @@ HANDOFF.md
 sweep*.log
 sweep6.pid
 retest_ar96.pid
+
+# Generated runtime artifacts
+retest_ar96*.log
+scoring/disposition_data/
+scoring/disposition_testset.json
+scoring/disposition_prompt_candidate.txt
+scoring/optimize_disposition_results.jsonl
+scoring/disposition_prompt_winner.txt
