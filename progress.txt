@@ -1,17 +1,18 @@
-Last session: 2026-04-09
+Last session: 2026-04-10
 Last tool: claude-code
-Built: Intelligence Pipeline scoring model — autoresearch applied to real system.
-  Phase 1: Dataset (390 items), baseline LR model (R@200: 58.2% vs keyword 38.6%)
-  Phase 2: Autoresearch optimization loop (optimize_scorer.py) + 3 AM launchd plist
-  Phase 3: Deployed learned weights to scoring.ts on Helsinki (max-of-both fallback)
-  All code in scoring/ subdirectory.
-In progress: Overnight optimization loop running at 3 AM nightly.
-  Next project: Disposition prompt optimization (autoresearch for prompts).
+Built: Disposition prompt optimizer — autoresearch for prompts applied to pipeline.
+  Phase 1: Test set (36 ground truth claims, 21 items), prompt template, system context builder
+  Phase 2: Per-item evaluator via claude --print (F1/precision/recall scoring)
+  Phase 3: Optimization loop (propose → validate → evaluate → keep/revert)
+  Phase 4: Shell wrapper + 3:30 AM launchd plist
+  Phase 5: Dry-run verified, baseline measured: 26.7% F1 (100% precision, 15.4% recall)
+  All code in scoring/ subdirectory alongside scoring model optimizer.
+In progress: Both overnight optimizers running nightly (scoring 3:00 AM, disposition 3:30 AM).
 Blocked: Nothing.
-Next: Build disposition prompt optimizer to fill the 3:30-7:00 AM window.
-  Handoff written to ~/vaults/Alex Hitt/Projects/Intelligence-Pipeline/handoff-disposition-prompt-optimizer-2026-04-09.md
-Phase: Scoring model COMPLETE + deployed. Disposition prompt optimizer PLANNED.
+Next: Check overnight results. If disposition prompt improved, deploy winning prompt to application.ts.
+  TS consumer for scoring-model.json still needs to be wired in command-center.
+Phase: Scoring model COMPLETE + deployed. Disposition optimizer COMPLETE + deployed.
 
-Plan: Projects/Intelligence-Pipeline/plan-autoresearch-scoring-model-2026-04-09.md
-Completed: Phase 1 (dataset + baseline), Phase 2 (optimizer + launchd), Phase 3 (deploy)
-Next: Disposition prompt optimizer (new session)
+Plan: Projects/Intelligence-Pipeline/plan-disposition-optimizer-2026-04-10.md
+Completed: All 5 phases
+Next: Review overnight optimization results
