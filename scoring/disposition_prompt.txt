@@ -1,0 +1,33 @@
+You are classifying research claims for an AI automation system (the "AI OS").
+
+__SYSTEM_CONTEXT__
+
+IMPORTANT: Before classifying any claim as "apply_now", check the existing rules list above. If an existing rule already covers what the claim recommends, classify as "discard" with reason "already covered by {rule name}". Only classify as "apply_now" when the claim describes something genuinely NEW that the system does not already do.
+
+For each claim, assign a disposition:
+- "apply_now": the claim describes something the AI OS should act on. This includes: (a) a specific, concrete change that could be implemented now, (b) a security risk or vulnerability that needs attention, (c) a tool, SDK, or API capability that the system should integrate, (d) a validated strategy or technique directly relevant to an active project (e.g., prediction markets, content generation), or (e) a finding that reveals clear leverage for compounding an existing system. Do NOT classify as apply_now if the claim: targets a blocked or halted system, describes a general best practice already followed, is about the pipeline's own commits, or would require building an entirely new system with no existing foundation.
+- "candidate_insight": novel and plausible — could inform future direction, validate or challenge current approaches, or become actionable as systems evolve. Worth surfacing to the owner.
+- "discard": not actionable, too vague, too domain-specific, no clear application, OR already covered by an existing rule
+
+For ALL claims, regardless of disposition, provide:
+- "reason": one sentence explaining why this matters to the AI OS in plain language
+- "whyYes": 1-2 sentences — the strongest argument FOR acting on this claim, even if you classify it as candidate_insight or discard. Be specific: what capability or improvement would it enable? This is the "defense attorney" perspective — argue the claim's best case honestly.
+- "signalStrength": integer 1-10 — how much would acting on this claim benefit the AI OS owner? 10 = transformative leverage, critical security, or direct revenue impact. 5 = useful improvement to an existing system. 1 = marginally interesting. Rate honestly — most claims are 3-5.
+
+For "apply_now" claims, also provide a full understanding briefing. Write every field in plain English — no jargon, no academic language. Write as if explaining to the system owner who is smart but hasn't read the paper:
+- "actionSummary": one sentence — what to change, written as an instruction. Example: "Add structured event extraction to Stella's memory so she can answer time-based questions precisely."
+- "targetSurface": one of "rules", "skills", "code", "memory", "architecture", "process"
+- "impactLevel": one of "tweak" (change a few lines), "extend" (add something new), "rethink" (reconsider an approach)
+- "whatThisIs": 1-2 sentences. What did the paper find or propose? No jargon.
+- "whatItMeans": 1-2 sentences. How does this connect to our AI OS specifically? Name the specific system it would improve.
+- "whatChanges": 1-3 sentences. What files, systems, or behaviors would actually change if we implemented this? Be specific.
+- "whyNot": 1-2 sentences. What's the strongest reason to skip this? Be honest — effort, low priority, existing system is good enough, etc.
+
+Paper abstract:
+__ABSTRACT__
+
+Claims:
+__CLAIM_LIST__
+
+For each claim, include "claimId" matching the [id: ...] from above.
+Respond with JSON array only. No commentary.
