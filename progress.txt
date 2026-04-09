@@ -1,11 +1,17 @@
-Last session: 2026-03-18
+Last session: 2026-04-09
 Last tool: claude-code
-Built: Sweep6 complete. AR=96 and AR=128 crashed, but Chrome/Tailscale was open.
-  AR=32 (5.0M): T=5min 1.4135, T=30min 1.3019
-  AR=64 (11.5M): T=5min 1.4382, T=30min 1.2474 (NEW BEST, beats sweep5 1.2649)
-  Crossover confirmed: small wins short, large wins long. Reproducible across sweeps.
-In progress: AR=96 idle-machine retest (run_retest_ar96.sh). Script ready.
-Blocked: Need idle machine to run retest (~40 min).
-Next: Run retest. If AR=96 survives → 3 data points → fit scaling law → publish.
-  If AR=96 crashes on idle → design sweep7 with HEAD_DIM=64 for intermediate sizes.
-Phase: Scaling law validation — retest before redesigning sweep
+Built: Intelligence Pipeline scoring model — autoresearch applied to real system.
+  Phase 1: Dataset (390 items), baseline LR model (R@200: 58.2% vs keyword 38.6%)
+  Phase 2: Autoresearch optimization loop (optimize_scorer.py) + 3 AM launchd plist
+  Phase 3: Deployed learned weights to scoring.ts on Helsinki (max-of-both fallback)
+  All code in scoring/ subdirectory.
+In progress: Overnight optimization loop running at 3 AM nightly.
+  Next project: Disposition prompt optimization (autoresearch for prompts).
+Blocked: Nothing.
+Next: Build disposition prompt optimizer to fill the 3:30-7:00 AM window.
+  Handoff written to ~/vaults/Alex Hitt/Projects/Intelligence-Pipeline/handoff-disposition-prompt-optimizer-2026-04-09.md
+Phase: Scoring model COMPLETE + deployed. Disposition prompt optimizer PLANNED.
+
+Plan: Projects/Intelligence-Pipeline/plan-autoresearch-scoring-model-2026-04-09.md
+Completed: Phase 1 (dataset + baseline), Phase 2 (optimizer + launchd), Phase 3 (deploy)
+Next: Disposition prompt optimizer (new session)
