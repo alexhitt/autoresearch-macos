@@ -1,0 +1,93 @@
+{
+  "config": {
+    "tfidf": {
+      "max_features": 500,
+      "min_df": 2,
+      "max_df": 0.95,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "sublinear_tf": true
+    },
+    "features": {
+      "use_source_id": true,
+      "use_source_kind": true,
+      "use_url_domain": false,
+      "use_summary_length": true,
+      "use_mission_count": true
+    },
+    "model": {
+      "type": "logistic_regression",
+      "C": 1.0,
+      "class_weight": "balanced"
+    },
+    "label": {
+      "treat_soft_as": "positive",
+      "gold_weight": 3.0
+    }
+  },
+  "cv_results": {
+    "fold_metrics": [
+      {
+        "fold": 0,
+        "recall@100": 0.32142857142857145,
+        "recall@200": 0.625,
+        "recall@300": 0.8214285714285714,
+        "recall@400": 1.0,
+        "recall@672": 1.0,
+        "precision@recall_0.95": 0.72,
+        "auc_roc": 0.7037337662337662
+      },
+      {
+        "fold": 1,
+        "recall@100": 0.30357142857142855,
+        "recall@200": 0.5178571428571429,
+        "recall@300": 0.8035714285714286,
+        "recall@400": 1.0,
+        "recall@672": 1.0,
+        "precision@recall_0.95": 0.7297297297297297,
+        "auc_roc": 0.5844155844155844
+      },
+      {
+        "fold": 2,
+        "recall@100": 0.32142857142857145,
+        "recall@200": 0.6071428571428571,
+        "recall@300": 0.8214285714285714,
+        "recall@400": 1.0,
+        "recall@672": 1.0,
+        "precision@recall_0.95": 0.72,
+        "auc_roc": 0.6866883116883116
+      },
+      {
+        "fold": 3,
+        "recall@100": 0.32142857142857145,
+        "recall@200": 0.6071428571428571,
+        "recall@300": 0.875,
+        "recall@400": 1.0,
+        "recall@672": 1.0,
+        "precision@recall_0.95": 0.782608695652174,
+        "auc_roc": 0.7313311688311688
+      },
+      {
+        "fold": 4,
+        "recall@100": 0.26785714285714285,
+        "recall@200": 0.5535714285714286,
+        "recall@300": 0.8035714285714286,
+        "recall@400": 1.0,
+        "recall@672": 1.0,
+        "precision@recall_0.95": 0.7297297297297297,
+        "auc_roc": 0.5584415584415584
+      }
+    ],
+    "average": {
+      "recall@100": 0.3071428571428571,
+      "recall@200": 0.5821428571428571,
+      "recall@300": 0.825,
+      "recall@400": 1.0,
+      "recall@672": 1.0,
+      "precision@recall_0.95": 0.7364136310223266,
+      "auc_roc": 0.6529220779220779
+    }
+  }
+}

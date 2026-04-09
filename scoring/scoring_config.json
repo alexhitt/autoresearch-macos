@@ -1,0 +1,25 @@
+{
+  "tfidf": {
+    "max_features": 500,
+    "min_df": 2,
+    "max_df": 0.95,
+    "ngram_range": [1, 2],
+    "sublinear_tf": true
+  },
+  "features": {
+    "use_source_id": true,
+    "use_source_kind": true,
+    "use_url_domain": false,
+    "use_summary_length": true,
+    "use_mission_count": true
+  },
+  "model": {
+    "type": "logistic_regression",
+    "C": 1.0,
+    "class_weight": "balanced"
+  },
+  "label": {
+    "treat_soft_as": "positive",
+    "gold_weight": 3.0
+  }
+}

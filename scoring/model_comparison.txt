@@ -1,0 +1,27 @@
+============================================================
+SCORING MODEL BASELINE REPORT
+============================================================
+
+Config:
+  TF-IDF: max_features=500, ngram_range=[1, 2]
+  Features: use_source_id, use_source_kind, use_summary_length, use_mission_count
+  Model: logistic_regression (C=1.0)
+  Labels: soft_as=positive, gold_weight=3.0
+
+Cross-Validated Metrics (5-fold):
+
+  Metric                         Model    Keyword      Delta
+  ------------------------- ---------- ---------- ----------
+  Recall@100                     30.7%     26.3%     +4.4% ✓
+  Recall@200                     58.2%     38.6%    +19.6% ✓
+  Recall@300                     82.5%     54.4%    +28.1% ✓
+  Recall@400                    100.0%     70.2%    +29.8% ✓
+  Recall@672                    100.0%     96.5%     +3.5% ✓
+
+  Precision@Recall=0.95: 73.6%
+  AUC-ROC:               0.653
+
+Gate: recall@200 > 38.6% (keyword baseline)
+Result: 58.2% — PASS
+
+============================================================
