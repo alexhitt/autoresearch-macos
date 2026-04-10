@@ -83,7 +83,7 @@ def parse_claude_output(raw):
 
 
 def run_claude_print(prompt, timeout=120):
-    """Call claude --print and return raw stdout."""
+    """Call claude --print and return raw stdout. Retries once after 60s on failure."""
     result = subprocess.run(
         ["claude", "--print", "-p", prompt, "--output-format", "json"],
         capture_output=True,
@@ -91,7 +91,16 @@ def run_claude_print(prompt, timeout=120):
         timeout=timeout,
     )
     if result.returncode != 0:
-        raise RuntimeError(f"claude --print failed (rc={result.returncode}): {result.stderr[:300]}")
+        print(f"claude --print failed, retrying in 60s...", file=sys.stderr)
+        time.sleep(60)
+        result = subprocess.run(
+            ["claude", "--print", "-p", prompt, "--output-format", "json"],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"claude --print failed (rc={result.returncode}): {result.stderr[:300]}")
     return result.stdout.strip()
 
 

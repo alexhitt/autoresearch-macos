@@ -218,6 +218,7 @@ def main():
 
     history = load_history()
     no_improvement_streak = 0
+    consecutive_proposer_failures = 0
 
     print(f"\n{'=' * 60}")
     print(f"Starting optimization ({args.max_iters} iterations)")
@@ -235,12 +236,21 @@ def main():
         try:
             proposal = propose(best_prompt, baseline_metrics if iter_num == 1 else history[-1].get("metrics", baseline_metrics), history)
         except Exception as e:
+            consecutive_proposer_failures += 1
+            backoff_times = {1: 60, 2: 120, 3: 240}
+            sleep_time = backoff_times.get(consecutive_proposer_failures, 240)
             print(f"  Proposer failed: {e}")
+            print(f"  proposer failed, backing off {sleep_time}s (attempt {consecutive_proposer_failures}/3)")
             entry = {"iter": iter_num, "kept": False, "error": f"proposer: {str(e)[:200]}"}
             history.append(entry)
             with open(RESULTS_FILE, "a") as f:
                 f.write(json.dumps(entry) + "\n")
+            if consecutive_proposer_failures >= 3:
+                print("  3 consecutive proposer failures — rate limit not recovering, stopping.")
+                break
+            time.sleep(sleep_time)
             continue
+        consecutive_proposer_failures = 0  # reset on success
         propose_time = time.time() - t_propose
         print(f"  Proposed in {propose_time:.1f}s ({len(proposal)} chars)")
 
