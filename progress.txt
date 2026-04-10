@@ -1,18 +1,11 @@
-Last session: 2026-04-10
+Last session: 2026-04-11
 Last tool: claude-code
-Built: Disposition prompt optimizer — autoresearch for prompts applied to pipeline.
-  Phase 1: Test set (36 ground truth claims, 21 items), prompt template, system context builder
-  Phase 2: Per-item evaluator via claude --print (F1/precision/recall scoring)
-  Phase 3: Optimization loop (propose → validate → evaluate → keep/revert)
-  Phase 4: Shell wrapper + 3:30 AM launchd plist
-  Phase 5: Dry-run verified, baseline measured: 26.7% F1 (100% precision, 15.4% recall)
-  All code in scoring/ subdirectory alongside scoring model optimizer.
-In progress: Both overnight optimizers running nightly (scoring 3:00 AM, disposition 3:30 AM).
+Built: Rate limit hardening across both optimizers.
+  - Scoring optimizer: exponential backoff (60/120/240s, break@3), removed phantom model types (GB/RF always trained as LR)
+  - Disposition optimizer: exponential backoff (60/120/240s, break@3), schedule moved 3:30→5:30 AM to avoid contention
+  - Dataset grew 411→466 items (58→63 gold) via backfill of 50 un-dispositioned items
+  - Disposition prompt iter 1 winner deployed to production (F1 23.5%→71.8%)
+In progress: Both optimizers running nightly (scoring 3:00 AM, disposition 5:30 AM). 362 items still need disposition backfill.
 Blocked: Nothing.
-Next: Check overnight results. If disposition prompt improved, deploy winning prompt to application.ts.
-  TS consumer for scoring-model.json still needs to be wired in command-center.
-Phase: Scoring model COMPLETE + deployed. Disposition optimizer COMPLETE + deployed.
-
-Plan: Projects/Intelligence-Pipeline/plan-disposition-optimizer-2026-04-10.md
-Completed: All 5 phases
-Next: Review overnight optimization results
+Next: Check overnight results. Run more backfill (362 items remaining). If dataset reaches ~600+, scoring model should break plateau.
+Phase: Scoring model + Disposition optimizer COMPLETE + deployed. Ongoing overnight optimization.
