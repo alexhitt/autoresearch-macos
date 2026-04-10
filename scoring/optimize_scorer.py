@@ -40,7 +40,7 @@ KEYWORD_BASELINES = {
     672: 0.965,
 }
 
-VALID_MODEL_TYPES = {"logistic_regression", "gradient_boosting", "random_forest"}
+VALID_MODEL_TYPES = {"logistic_regression"}
 
 
 def load_history():
@@ -168,7 +168,7 @@ STRATEGY NOTES:
 - TF-IDF captures text patterns that correlate with actionable content
 - Larger ngram_range captures phrases but increases dimensionality
 - Higher gold_weight makes the model focus more on the rare gold items
-- gradient_boosting and random_forest can capture non-linear interactions but may overfit on 390 items
+- only logistic_regression is supported (gradient_boosting/random_forest were removed — build_model always trained LR regardless)
 
 Propose a NEW config that you think will achieve a HIGHER composite score.
 Think about what hasn't been tried. Consider combinations and interactions.
@@ -254,6 +254,7 @@ def main():
 
     history = load_history()
     no_improvement_streak = 0
+    consecutive_proposer_failures = 0
 
     print(f"{'=' * 60}")
     print(f"Starting optimization ({args.max_iters} iterations)")
@@ -273,12 +274,21 @@ def main():
         try:
             proposal = propose(best_config, history, fi, rows_info)
         except Exception as e:
+            consecutive_proposer_failures += 1
+            backoff_times = {1: 60, 2: 120, 3: 240}
+            sleep_time = backoff_times.get(consecutive_proposer_failures, 240)
             print(f"  Proposer failed: {e}")
+            print(f"  proposer failed, backing off {sleep_time}s (attempt {consecutive_proposer_failures}/3)")
             entry = {"iter": iter_num, "kept": False, "error": f"proposer: {str(e)[:200]}"}
             history.append(entry)
             with open(RESULTS_FILE, "a") as f:
                 f.write(json.dumps(entry) + "\n")
+            if consecutive_proposer_failures >= 3:
+                print("  3 consecutive proposer failures — rate limit not recovering, stopping.")
+                break
+            time.sleep(sleep_time)
             continue
+        consecutive_proposer_failures = 0  # reset on success
 
         # Step 3: Validate
         valid, reason = validate_config(proposal)
