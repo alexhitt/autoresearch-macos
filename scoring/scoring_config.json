@@ -1,11 +1,11 @@
 {
   "tfidf": {
-    "max_features": 400,
+    "max_features": 1800,
     "min_df": 2,
-    "max_df": 0.9,
+    "max_df": 0.75,
     "ngram_range": [
       1,
-      2
+      3
     ],
     "sublinear_tf": true
   },
@@ -18,11 +18,11 @@
   },
   "model": {
     "type": "logistic_regression",
-    "C": 0.5,
+    "C": 0.8,
     "class_weight": "balanced"
   },
   "label": {
     "treat_soft_as": "positive",
-    "gold_weight": 5.0
+    "gold_weight": 9.0
   }
 }

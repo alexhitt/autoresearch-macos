@@ -1,19 +1,19 @@
 Dataset Statistics
 ==================
-Total items: 466
+Total items: 461
 
 Label distribution:
-  gold (apply_now/queue_research): 63
-  soft (candidate_insight):        279
-  negative (discard only):         124
+  gold (apply_now/queue_research): 59
+  soft (candidate_insight):        273
+  negative (discard only):         129
 
 Binary framing (gold+soft vs negative):
-  positive: 342
-  negative: 124
+  positive: 332
+  negative: 129
 
 Features:
   Unique sourceIds: 26
   Unique sourceKinds: 3
-  Unique URL domains: 24
-  Summary length: min=110 mean=1721 max=50486
+  Unique URL domains: 23
+  Summary length: min=110 mean=1682 max=50486
   Mission count: min=1 mean=2.6 max=4

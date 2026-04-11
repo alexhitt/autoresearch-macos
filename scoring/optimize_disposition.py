@@ -24,7 +24,7 @@ RESULTS_FILE = os.path.join(SCRIPT_DIR, "optimize_disposition_results.jsonl")
 
 # Sentinels that must be present in every valid prompt
 REQUIRED_SENTINELS = ["__SYSTEM_CONTEXT__", "__ABSTRACT__", "__CLAIM_LIST__"]
-MAX_PROMPT_CHARS = 5000
+MAX_PROMPT_CHARS = 6000
 
 # Import evaluator
 import sys
@@ -130,7 +130,8 @@ CONSTRAINTS:
 - You MUST keep the "claimId" instruction and "JSON array" output format instruction
 - You MUST keep all three disposition types: apply_now, candidate_insight, discard
 - Max length: {MAX_PROMPT_CHARS} characters
-- You MUST keep the output fields for apply_now claims (actionSummary, targetSurface, impactLevel, whatThisIs, whatItMeans, whatChanges, whyNot) — the production system requires them
+- You MUST keep the output fields for apply_now claims (actionSummary, targetSurface, impactLevel, whatThisIs, whatItMeans, whatChanges, whyNot, whyYes, signalStrength) — the production system requires them
+- Claims are formatted as XML: <claim id="..." index="..." category="...">text</claim>. The claimId instruction must reference the id attribute from <claim> tags.
 
 STRATEGY NOTES:
 - False positives (FP={current_metrics.get('fp', 0)}): The prompt classified these as apply_now but the owner skipped them. Consider tightening the apply_now criteria.

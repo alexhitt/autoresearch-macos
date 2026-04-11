@@ -19,53 +19,46 @@ RULES_DIR = os.path.join(VAULT_BASE, "_System/Config/rules")
 REGISTRY_PATH = os.path.join(VAULT_BASE, "_System/Config/projects-registry.yaml")
 
 
-def read_stella_context(max_chars=4000):
+def read_disposition_context():
+    """Extract structured, decision-useful sections from Stella/Context.md.
+
+    Matches production buildDispositionContext() in application.ts —
+    pulls specific sections instead of arbitrary slicing.
+    """
     try:
         with open(STELLA_CONTEXT_PATH) as f:
-            return f.read()[:max_chars]
+            raw = f.read()
     except FileNotFoundError:
         return "AI OS: automation, dashboards, research intelligence, prediction markets, NightMind orchestration, Obsidian vault."
 
+    sections = []
 
-def build_rules_index():
-    try:
-        entries = sorted(os.listdir(RULES_DIR))
-    except FileNotFoundError:
-        return "(rules directory not available)"
+    # Extract "Active Projects" table
+    projects_match = re.search(r"## Active Projects\n\n((?:\|.*\n)+)", raw)
+    if projects_match:
+        sections.append("## Active Projects\n" + projects_match.group(1).strip())
 
-    lines = []
-    for filename in entries:
-        if not filename.endswith(".md") or ".archived" in filename:
-            continue
-        filepath = os.path.join(RULES_DIR, filename)
-        try:
-            with open(filepath) as f:
-                content = f.read()
-        except (FileNotFoundError, PermissionError):
-            continue
+    # Extract "Strategic Priorities"
+    priorities_match = re.search(r"## Strategic Priorities[^\n]*\n\n((?:(?!\n## ).+\n?)+)", raw)
+    if priorities_match:
+        sections.append("## Strategic Priorities\n" + priorities_match.group(1).strip())
 
-        # Extract title from first heading
-        title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
-        title = title_match.group(1) if title_match else filename.replace(".md", "")
+    # Extract "Active Systems" inventory
+    systems_match = re.search(r"## Active Systems[^\n]*\n\n((?:(?!\n## ).+\n?)+)", raw)
+    if systems_match:
+        sections.append("## Active Systems\n" + systems_match.group(1).strip())
 
-        # Extract first substantive paragraph for context
-        paragraphs = [
-            p.strip()
-            for p in content.split("\n\n")
-            if p.strip() and not p.strip().startswith("---") and not p.strip().startswith("#")
-        ]
-        summary = paragraphs[0].replace("\n", " ").strip()[:150] if paragraphs else ""
+    if not sections:
+        return raw[:2000]
 
-        name = filename.replace(".md", "")
-        line = f"- {name}: {title}"
-        if summary:
-            line += f" — {summary}"
-        lines.append(line)
-
-    return "\n".join(lines) if lines else "(no rules found)"
+    return "\n\n".join(sections)
 
 
 def build_project_state():
+    """Parse projects-registry.yaml matching production buildProjectStateContext().
+
+    Includes built field and OPERATIONAL STATE label (not just in-progress).
+    """
     try:
         with open(REGISTRY_PATH) as f:
             raw = f.read()
@@ -77,14 +70,20 @@ def build_project_state():
     current_status = ""
     current_blocked = ""
     current_in_progress = ""
+    current_built = ""
+
+    def is_null(v):
+        return not v or v in ("null", "None", "nothing", "Nothing")
 
     def emit():
         if current_project and current_status:
             parts = [f"{current_project}: {current_status}"]
-            if current_blocked and current_blocked not in ("null", "None"):
-                parts.append(f"BLOCKED: {current_blocked}")
-            if current_in_progress and current_in_progress not in ("null", "Nothing", "nothing"):
-                parts.append(f"in-progress: {current_in_progress[:80]}")
+            if not is_null(current_blocked):
+                parts.append(f"BLOCKED: {current_blocked[:120]}")
+            if not is_null(current_in_progress):
+                parts.append(f"OPERATIONAL STATE: {current_in_progress[:200]}")
+            if not is_null(current_built):
+                parts.append(f"BUILT: {current_built[:120]}")
             lines.append(f"- {' | '.join(parts)}")
 
     for line in raw.split("\n"):
@@ -95,6 +94,7 @@ def build_project_state():
             current_status = ""
             current_blocked = ""
             current_in_progress = ""
+            current_built = ""
             continue
 
         status_match = re.match(r"^\s+status:\s*(.+)", line)
@@ -109,26 +109,33 @@ def build_project_state():
         if ip_match:
             current_in_progress = ip_match.group(1).strip()
 
+        built_match = re.match(r"^\s+built:\s*(.+)", line)
+        if built_match:
+            current_built = built_match.group(1).strip()
+
     emit()
     return "\n".join(lines) if lines else "(no project state available)"
 
 
 def build_system_context():
-    stella = read_stella_context()
-    rules = build_rules_index()
-    projects = build_project_state()
+    """Build system context matching production buildSystemContextSummary().
+
+    Production removed rules index (adds ~800 tokens of noise that dilutes
+    decision quality). Uses structured section extraction instead of raw slice.
+    """
+    disposition_context = read_disposition_context()
+    project_state = build_project_state()
 
     return "\n".join([
-        "## Current AI OS State",
-        stella,
+        "## AI OS — Structured System State",
+        disposition_context,
         "",
         "## Live Project Status (from projects-registry.yaml)",
-        "Use this to determine what is CURRENTLY active, blocked, or halted. Do NOT classify a claim as apply_now if it targets a blocked or halted system unless it specifically addresses the blocker.",
-        projects,
-        "",
-        "## Existing System Rules (already implemented)",
-        "The following rules already govern the AI OS. Do NOT recommend something as apply_now if an existing rule already covers it:",
-        rules,
+        "CRITICAL: Use this to determine what is CURRENTLY running. "
+        '"active" status alone is NOT sufficient — read the OPERATIONAL STATE field. '
+        "Systems that are halted, decommissioned, have zero usage, or have zero trades "
+        "are NOT operationally ready for improvements.",
+        project_state,
     ])
 
 
