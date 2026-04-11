@@ -16,7 +16,13 @@ mkdir -p "$LOG_DIR"
 echo "=== Autoresearch Scoring Optimizer ===" | tee -a "$LOG_FILE"
 echo "Started: $(date)" | tee -a "$LOG_FILE"
 
-# Refresh dataset from latest pipeline data
+# Refresh pipeline data from Helsinki
+echo "Refreshing pipeline data from Helsinki..." | tee -a "$LOG_FILE"
+mkdir -p "$HOME/.lead-command/signals"
+scp -q root@100.94.225.67:~/.lead-command/signals/items.json "$HOME/.lead-command/signals/items.json" >> "$LOG_FILE" 2>&1
+scp -q root@100.94.225.67:~/.lead-command/signals/claims.json "$HOME/.lead-command/signals/claims.json" >> "$LOG_FILE" 2>&1
+
+# Rebuild dataset from fresh data
 echo "Rebuilding dataset..." | tee -a "$LOG_FILE"
 python3 "$SCRIPT_DIR/build_dataset.py" >> "$LOG_FILE" 2>&1
 

@@ -15,7 +15,6 @@ import re
 
 VAULT_BASE = os.path.expanduser("~/vaults/Alex Hitt")
 STELLA_CONTEXT_PATH = os.path.join(VAULT_BASE, "Stella/Context.md")
-RULES_DIR = os.path.join(VAULT_BASE, "_System/Config/rules")
 REGISTRY_PATH = os.path.join(VAULT_BASE, "_System/Config/projects-registry.yaml")
 
 

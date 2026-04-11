@@ -54,6 +54,13 @@ def load_history():
     return history
 
 
+REQUIRED_GATES = [
+    "OPERATIONAL READINESS",
+    "NOVELTY",
+    "CONCRETE DELIVERABLE",
+]
+
+
 def validate_prompt(prompt):
     """Safety checks on proposed prompt."""
     for sentinel in REQUIRED_SENTINELS:
@@ -75,6 +82,11 @@ def validate_prompt(prompt):
     for disp in ["apply_now", "candidate_insight", "discard"]:
         if disp not in prompt:
             return False, f"Missing disposition type: {disp}"
+
+    # Must preserve three-gate structure (designed to reduce false positives)
+    for gate in REQUIRED_GATES:
+        if gate not in prompt:
+            return False, f"Missing required gate: {gate}"
 
     return True, "ok"
 
