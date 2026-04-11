@@ -4,50 +4,56 @@ __SYSTEM_CONTEXT__
 
 YOUR TASK: For each claim, decide whether the AI OS owner should act on it RIGHT NOW.
 
-BEFORE classifying any claim as "apply_now", verify ALL THREE of these gates:
+BEFORE classifying, verify these THREE gates. A claim must pass ALL THREE to be apply_now:
 
-1. OPERATIONAL READINESS — Is the target system actually running in production and actively maintained?
-   - Check the Live Project Status above, especially the OPERATIONAL STATE field.
-   - Systems marked "halted", "blocked", "decommissioned", or "planned" are NOT ready.
-   - A system that exists as code but has zero usage, zero trades, or is turned off is NOT operationally ready.
-   - "We have code for this" is NOT the same as "this system is running and would benefit."
+1. OPERATIONAL READINESS — Can this be applied to something the owner actively runs?
+   - Check the Live Project Status above for active, maintained systems.
+   - "Applies to" means: the owner has a running system where this pattern, fix, or capability is relevant. It does NOT require the claim to name a specific system.
+   - Security vulnerability patterns from external code are READY if the owner runs similar code (e.g., MCP servers, Python services, Node.js apps, trading bots).
+   - SDK/API features are READY if the owner uses that SDK in any active project.
+   - Architectural patterns are READY if any active system has the problem the pattern solves.
+   - Systems marked "halted", "decommissioned", or "planned" are NOT ready.
 
-2. NOVELTY — Does this capability already exist in the AI OS through ANY mechanism?
-   - Consider: does an existing tool, skill, workflow, or automation already achieve the same outcome through a different approach?
-   - Match on CAPABILITY, not just keywords. "Parallel research before coding" is not novel if pre-plan workflows already do this.
+2. NOVELTY — Does this provide something the AI OS does NOT already have?
+   - Match on CAPABILITY, not keywords. If an existing tool or workflow achieves the same outcome, it is not novel.
+   - A claim about a technique the owner already uses (CLAUDE.md as memory, parallel agents, compound learning) is NOT novel.
+   - A claim about the owner's own shipped feature is NOT novel.
+   - But: a NEW pattern for an existing capability IS novel (e.g., a better memory architecture, a new divergence metric).
 
-3. CONCRETE DELIVERABLE — Would acting on this claim produce a specific, shippable change?
-   - "Audit all X" or "ensure each Y has Z" produces a list, not a deliverable. That is candidate_insight.
-   - The test: can you name the specific file that would change and what the diff would look like?
+3. CONCRETE DELIVERABLE — Does this contain enough specificity to guide a concrete change?
+   - The test: could an engineer read this claim and know what to build, fix, or change?
+   - Concrete: specific vulnerability type + fix approach, specific API method names, specific algorithm or metric, specific architectural pattern with defined components.
+   - NOT concrete: "use AI for X", "add tests", "audit all Y", general best practices without a specific mechanism.
 
-If a claim fails ANY gate, it is NOT apply_now — even if the topic is highly relevant.
-
-CLASSIFICATION BIAS: When genuinely uncertain between apply_now and candidate_insight for a claim that passes all three gates, lean toward apply_now. But never use this bias to skip the gates.
+CLASSIFICATION GUIDANCE:
+- The owner acts on TRANSFERABLE PATTERNS: security fixes from external repos, architectural ideas from papers, new SDK capabilities, validated techniques with implementation detail.
+- The owner skips: things describing what the AI OS already does, generic advice, their own past work, and observations without a specific actionable mechanism.
+- When genuinely uncertain and all three gates pass, lean toward apply_now.
 
 For each claim, assign a disposition:
-- "apply_now": passes all three gates AND describes a concrete improvement. Specifically:
-  (a) A security vulnerability or defensive technique applicable to a system that is currently running
-  (b) A new SDK/API capability that an active, running system could use immediately
-  (c) A validated technique directly relevant to an active project that is NOT halted, blocked, or decommissioned
-  (d) A finding that fixes a known limitation in a system with real usage
-  (e) A concrete implementation pattern that maps onto a system we actively run (not just have code for)
-  Do NOT classify as apply_now if: the target system is inactive/halted/decommissioned, the capability already exists through another mechanism, the action is "audit" or "evaluate" without a concrete code change, or it would require building a new system from scratch.
-- "candidate_insight": relevant to the AI OS domain but fails one or more of the three gates. Worth preserving but not actionable right now.
-- "discard": not relevant to AI systems, too vague to act on, or already covered by an existing system capability.
+- "apply_now": passes all three gates. Specifically:
+  (a) A security vulnerability pattern or defensive technique transferable to any running system
+  (b) A new SDK/API capability for a tool the owner actively uses
+  (c) A validated architectural pattern or algorithm applicable to an active project
+  (d) A research finding with specific enough detail to implement (named methods, metrics, data structures)
+  (e) A concrete implementation pattern that solves a problem an active system has
+  Do NOT classify as apply_now if: no active system could benefit, the capability already exists, the claim is the owner's own work, or it lacks specificity to guide a change.
+- "candidate_insight": relevant to the AI OS domain but fails one or more gates. Worth preserving.
+- "discard": not relevant, too vague, or fully covered by existing capability.
 
 For ALL claims, regardless of disposition, provide:
-- "reason": one sentence explaining the disposition — specifically which gate it passed or failed
-- "whyYes": 1-2 sentences — the strongest argument FOR acting on this claim, even if classified as discard
-- "signalStrength": integer 1-10 — how much would acting on this claim benefit the AI OS owner? 10 = transformative. 5 = useful. 1 = marginal.
+- "reason": one sentence — which gate(s) it passed or failed
+- "whyYes": 1-2 sentences — strongest argument FOR acting on this claim
+- "signalStrength": integer 1-10 — benefit to the AI OS owner (10=transformative, 5=useful, 1=marginal)
 
 For "apply_now" claims, also provide:
-- "actionSummary": one sentence — what to change, written as an instruction
+- "actionSummary": one sentence — what to change, as an instruction
 - "targetSurface": one of "rules", "skills", "code", "memory", "architecture", "process"
-- "impactLevel": one of "tweak" (change a few lines), "extend" (add something new), "rethink" (reconsider an approach)
-- "whatThisIs": 1-2 sentences. What did the paper find or propose? No jargon.
-- "whatItMeans": 1-2 sentences. How does this connect to our AI OS specifically? Name the specific running system.
-- "whatChanges": 1-3 sentences. What specific files, systems, or behaviors would change?
-- "whyNot": 1-2 sentences. Strongest reason to skip — include scale, complexity, and whether the target system is mature enough.
+- "impactLevel": one of "tweak", "extend", "rethink"
+- "whatThisIs": 1-2 sentences. What the paper found or proposed, no jargon.
+- "whatItMeans": 1-2 sentences. How it connects to the AI OS. Name the relevant system.
+- "whatChanges": 1-3 sentences. What files, systems, or behaviors would change.
+- "whyNot": 1-2 sentences. Strongest reason to skip.
 
 <abstract>
 __ABSTRACT__

@@ -162,7 +162,7 @@ Return ONLY the full prompt text. No explanation, no markdown fences, no comment
         ["claude", "--print", "-p", proposer_prompt],
         capture_output=True,
         text=True,
-        timeout=180,
+        timeout=300,
     )
 
     if result.returncode != 0:
