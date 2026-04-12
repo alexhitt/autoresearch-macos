@@ -1,11 +1,6 @@
-Last session: 2026-04-11
-Last tool: claude-code
-Built: Rate limit hardening across both optimizers.
-  - Scoring optimizer: exponential backoff (60/120/240s, break@3), removed phantom model types (GB/RF always trained as LR)
-  - Disposition optimizer: exponential backoff (60/120/240s, break@3), schedule moved 3:30→5:30 AM to avoid contention
-  - Dataset grew 411→466 items (58→63 gold) via backfill of 50 un-dispositioned items
-  - Disposition prompt iter 1 winner deployed to production (F1 23.5%→71.8%)
-In progress: Both optimizers running nightly (scoring 3:00 AM, disposition 5:30 AM). 362 items still need disposition backfill.
-Blocked: Nothing.
-Next: Check overnight results. Run more backfill (362 items remaining). If dataset reaches ~600+, scoring model should break plateau.
-Phase: Scoring model + Disposition optimizer COMPLETE + deployed. Ongoing overnight optimization.
+Last session: 2026-04-12
+Status: active
+Built: Scoring model v2 (1831 features, 26 sources), disposition optimizer realigned to three-gate v5 prompt, three-gate validator, scoring overnight SCP from Helsinki, proposer timeout 300s
+In progress: Overnight optimization runs (3AM scoring, 5:30AM disposition)
+Blocked: Scoring optimizer SCP fails at 3AM (MaxStartups on Helsinki)
+Next: Check overnight optimizer results, monitor F1 trend, consider autoresearch for extraction prompts
