@@ -4,56 +4,70 @@ __SYSTEM_CONTEXT__
 
 YOUR TASK: For each claim, decide whether the AI OS owner should act on it RIGHT NOW.
 
-BEFORE classifying, verify these THREE gates. A claim must pass ALL THREE to be apply_now:
+CRITICAL BIAS: You are severely UNDER-classifying apply_now. Most claims that relate to the owner's technology stack ARE actionable. When in doubt, choose apply_now.
 
-1. OPERATIONAL READINESS — Can this be applied to something the owner actively runs?
-   - Check the Live Project Status above for active, maintained systems.
-   - "Applies to" means: the owner has a running system where this pattern, fix, or capability is relevant. It does NOT require the claim to name a specific system.
-   - Security vulnerability patterns from external code are READY if the owner runs similar code (e.g., MCP servers, Python services, Node.js apps, trading bots).
-   - SDK/API features are READY if the owner uses that SDK in any active project.
-   - Architectural patterns are READY if any active system has the problem the pattern solves.
-   - Systems marked "halted", "decommissioned", or "planned" are NOT ready.
+The owner actively runs: Claude-based AI agents, Claude Agent SDK, MCP servers, Python/Node.js services, prediction/trading bots, financial ML systems, an Obsidian vault, memory/recall pipelines, an intelligence pipeline, prompt classification, NLP pipelines, and dashboards.
 
-2. NOVELTY — Does this provide something the AI OS does NOT already have?
-   - Match on CAPABILITY, not keywords. If an existing tool or workflow achieves the same outcome, it is not novel.
-   - A claim about a technique the owner already uses (CLAUDE.md as memory, parallel agents, compound learning) is NOT novel.
-   - A claim about the owner's own shipped feature is NOT novel.
-   - But: a NEW pattern for an existing capability IS novel (e.g., a better memory architecture, a new divergence metric).
+THREE GATES — a claim needs all three for apply_now:
 
-3. CONCRETE DELIVERABLE — Does this contain enough specificity to guide a concrete change?
-   - The test: could an engineer read this claim and know what to build, fix, or change?
-   - Concrete: specific vulnerability type + fix approach, specific API method names, specific algorithm or metric, specific architectural pattern with defined components.
-   - NOT concrete: "use AI for X", "add tests", "audit all Y", general best practices without a specific mechanism.
+1. OPERATIONAL READINESS — Does this touch the owner's technology areas?
+   - If it involves AI agents, LLMs, SDKs, security, Python, Node.js, prediction markets, financial ML, NLP, memory systems, evaluation methods, prompt engineering, or infrastructure patterns → READY.
+   - Security patterns, error handling patterns, and architectural patterns from ANY codebase are READY — the owner runs similar infrastructure and adopts external patterns.
+   - SDK/API version updates for tools the owner uses → READY.
+   - Research on markets, prediction, trading strategies, information extraction, or AI evaluation → READY.
+   - Only NOT ready if the domain is completely unrelated (robotics hardware, biotech wet labs, chip fabrication).
 
-CLASSIFICATION GUIDANCE:
-- The owner acts on TRANSFERABLE PATTERNS: security fixes from external repos, architectural ideas from papers, new SDK capabilities, validated techniques with implementation detail.
-- The owner skips: things describing what the AI OS already does, generic advice, their own past work, and observations without a specific actionable mechanism.
-- When genuinely uncertain and all three gates pass, lean toward apply_now.
+2. NOVELTY — Is this something the owner hasn't already deployed?
+   - ONLY fails this gate if the claim describes the owner's OWN already-shipped code. Signals: it names a specific file in the owner's repo, describes a PR the owner merged, or documents a feature the owner already deployed to production.
+   - External code patterns that the owner COULD adopt → novel (even if from someone else's repo).
+   - Research findings, techniques, metrics, methods → always novel unless the owner's system already implements that exact technique.
+   - New SDK versions, API methods, vulnerability disclosures → always novel.
+   - DEFAULT: novel. You need strong evidence it's already deployed to fail this gate.
 
-For each claim, assign a disposition:
-- "apply_now": passes all three gates. Specifically:
-  (a) A security vulnerability pattern or defensive technique transferable to any running system
-  (b) A new SDK/API capability for a tool the owner actively uses
-  (c) A validated architectural pattern or algorithm applicable to an active project
-  (d) A research finding with specific enough detail to implement (named methods, metrics, data structures)
-  (e) A concrete implementation pattern that solves a problem an active system has
-  Do NOT classify as apply_now if: no active system could benefit, the capability already exists, the claim is the owner's own work, or it lacks specificity to guide a change.
-- "candidate_insight": relevant to the AI OS domain but fails one or more gates. Worth preserving.
-- "discard": not relevant, too vague, or fully covered by existing capability.
+3. CONCRETE DELIVERABLE — Is there enough specificity to act?
+   - Named algorithms, metrics, divergence measures, methods → concrete.
+   - Specific API endpoints, SDK methods, version numbers → concrete.
+   - Vulnerability names, attack vectors, dependency names → concrete.
+   - Architectural patterns with defined components (e.g., "multi-layer memory with extraction and fusion stages") → concrete.
+   - Research findings stating "X outperforms Y" or "X detects Y" with a named mechanism → concrete.
+   - Descriptions of system architectures with identifiable design choices → concrete.
+   - Only fails if the claim is a vague generality with zero mechanism (e.g., "AI is improving").
 
-For ALL claims, regardless of disposition, provide:
-- "reason": one sentence — which gate(s) it passed or failed
-- "whyYes": 1-2 sentences — strongest argument FOR acting on this claim
-- "signalStrength": integer 1-10 — benefit to the AI OS owner (10=transformative, 5=useful, 1=marginal)
+EXAMPLES OF APPLY_NOW (these patterns are frequently missed):
+- A malicious dependency found in a popular NPM package → apply_now (security action)
+- Prompt injection defense research with specific attack/defense findings → apply_now
+- A memory architecture with named internal stages → apply_now (the owner builds memory systems)
+- New SDK version with named new API methods → apply_now
+- Error handling or thread management patterns from external codebases → apply_now (adoptable pattern)
+- Statistical methods for detecting market inefficiencies → apply_now (owner runs trading bots)
+- ML debiasing techniques for financial prediction → apply_now
+- Event extraction / NLP structuring methods → apply_now (owner runs NLP pipelines)
+- Research on AI evaluation reliability → apply_now (owner uses AI-as-judge)
+- Trading strategy archetypes with validated performance → apply_now
+- Findings about reward function design in AI domains → apply_now
 
-For "apply_now" claims, also provide:
-- "actionSummary": one sentence — what to change, as an instruction
+EXAMPLES OF NOT APPLY_NOW:
+- The owner's own bugfix that is already merged and deployed → candidate_insight
+- A claim about a domain the owner has zero systems in → discard
+- Pure commentary with no technique, method, or finding → discard
+
+DECISION RULE: If ANY reasonable interpretation of the claim connects to the owner's systems AND it contains a specific technique/finding/pattern, classify as apply_now. The cost of missing actionable intelligence far exceeds the cost of reviewing a borderline claim.
+
+For each claim, assign: "apply_now", "candidate_insight", or "discard".
+
+For ALL claims provide:
+- "reason": one sentence — which gate(s) passed or failed
+- "whyYes": 1-2 sentences — strongest argument FOR acting
+- "signalStrength": integer 1-10
+
+For "apply_now" claims also provide:
+- "actionSummary": one sentence instruction
 - "targetSurface": one of "rules", "skills", "code", "memory", "architecture", "process"
 - "impactLevel": one of "tweak", "extend", "rethink"
-- "whatThisIs": 1-2 sentences. What the paper found or proposed, no jargon.
-- "whatItMeans": 1-2 sentences. How it connects to the AI OS. Name the relevant system.
-- "whatChanges": 1-3 sentences. What files, systems, or behaviors would change.
-- "whyNot": 1-2 sentences. Strongest reason to skip.
+- "whatThisIs": 1-2 sentences, no jargon
+- "whatItMeans": 1-2 sentences connecting to AI OS
+- "whatChanges": 1-3 sentences on files/systems/behaviors
+- "whyNot": 1-2 sentences — strongest reason to skip
 
 <abstract>
 __ABSTRACT__
