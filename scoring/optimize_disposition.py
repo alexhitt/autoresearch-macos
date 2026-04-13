@@ -91,7 +91,69 @@ def validate_prompt(prompt):
     return True, "ok"
 
 
-def propose(current_prompt, current_metrics, history):
+def research(baseline_metrics):
+    """Run a targeted research query based on current failure patterns.
+
+    Called once per optimization run (not per iteration). Returns a string
+    of prompt engineering guidance (~600-1000 chars) or empty string on failure.
+    """
+    errors = baseline_metrics.get("error_details", [])
+    if not errors:
+        return ""
+
+    # Build error summary for research query
+    fn_claims = [e for e in errors if e["ground_truth"] == "apply_now"]
+    fp_claims = [e for e in errors if e["ground_truth"] == "not_apply_now"]
+
+    error_summary = ""
+    if fn_claims:
+        error_summary += f"\nFalse negatives ({len(fn_claims)} actionable claims missed — classified as candidate_insight/discard):\n"
+        for e in fn_claims[:5]:
+            error_summary += f'  - "{e["claim_text"]}"\n'
+    if fp_claims:
+        error_summary += f"\nFalse positives ({len(fp_claims)} non-actionable claims promoted to apply_now):\n"
+        for e in fp_claims[:5]:
+            error_summary += f'  - "{e["claim_text"]}"\n'
+
+    research_prompt = f"""I'm optimizing a classification prompt that sorts research claims into three bins:
+- apply_now (actionable — owner should implement this)
+- candidate_insight (interesting but not actionable)
+- discard (irrelevant)
+
+The prompt runs via "claude --print" as a zero-shot classifier with system context about the owner's projects.
+
+Current performance: F1={baseline_metrics.get('apply_now_f1', 0):.1%}, Precision={baseline_metrics.get('apply_now_precision', 0):.1%}, Recall={baseline_metrics.get('apply_now_recall', 0):.1%}
+
+Here are the specific failure patterns:
+{error_summary}
+What specific prompt engineering techniques would fix these failure patterns? I need concrete, implementable techniques — not general advice. Focus on:
+1. Techniques to reduce false negatives (missed actionable claims)
+2. Techniques to reduce false positives (over-promoted beliefs)
+3. Structural prompt patterns that improve binary/ternary classification accuracy
+
+Be concise — under 800 words. Name specific techniques with brief descriptions of how to apply them."""
+
+    try:
+        result = subprocess.run(
+            ["claude", "--print", "-p", research_prompt],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        if result.returncode != 0:
+            print(f"  Research query failed (rc={result.returncode}), proceeding without research context.")
+            return ""
+        output = result.stdout.strip()
+        # Truncate if excessively long
+        if len(output) > 3000:
+            output = output[:3000] + "\n[truncated]"
+        return output
+    except Exception as e:
+        print(f"  Research query failed: {e}. Proceeding without research context.")
+        return ""
+
+
+def propose(current_prompt, current_metrics, history, research_context=""):
     """Ask claude --print to propose a modified disposition prompt."""
     history_text = ""
     if history:
@@ -113,6 +175,16 @@ def propose(current_prompt, current_metrics, history):
             error_text += f"  Ground truth: {e['ground_truth']} | Predicted: {e['predicted_raw']}\n"
             error_text += f"    Claim: \"{e['claim_text']}\"\n"
 
+    # Build research section if available
+    research_section = ""
+    if research_context:
+        research_section = f"""
+RESEARCH CONTEXT (prompt engineering techniques relevant to current failure patterns):
+{research_context[:2000]}
+--- end research ---
+Use these techniques to inform your modifications. Apply specific techniques, not generic advice.
+"""
+
     proposer_prompt = f"""You are optimizing a classification prompt for an AI intelligence pipeline.
 
 The prompt classifies research claims into: apply_now, candidate_insight, or discard.
@@ -129,29 +201,40 @@ CURRENT METRICS (baseline to beat):
   Accuracy:  {current_metrics.get('overall_accuracy', 0):.1%}
 {error_text}
 {history_text}
-CURRENT PROMPT:
+CURRENT PROMPT ({len(current_prompt)} of {MAX_PROMPT_CHARS} max characters — AIM FOR UNDER {MAX_PROMPT_CHARS - 300} to leave margin):
 ---
 {current_prompt}
 ---
 
+REQUIRED STRUCTURE — your output MUST contain all of these elements or it will be rejected:
+
+  Sentinels (exact strings, replaced at runtime):
+    __SYSTEM_CONTEXT__
+    __ABSTRACT__
+    __CLAIM_LIST__
+
+  Required gate headings (exact strings):
+    OPERATIONAL READINESS
+    NOVELTY
+    CONCRETE DELIVERABLE
+
+  Required output fields for apply_now: claimId, disposition, reason, whyYes, signalStrength,
+    actionSummary, targetSurface, impactLevel, whatThisIs, whatItMeans, whatChanges, whyNot
+
+  Must contain: "json" (output format instruction), all three types: apply_now, candidate_insight, discard
+  Must reference claimId from <claim> XML tags.
+
 CONSTRAINTS:
-- You MUST keep these exact sentinel strings (they are replaced at runtime):
-  __SYSTEM_CONTEXT__  (replaced with live AI OS state, rules, project status)
-  __ABSTRACT__        (replaced with the paper's abstract)
-  __CLAIM_LIST__      (replaced with numbered claims)
-- You MUST keep the "claimId" instruction and "JSON array" output format instruction
-- You MUST keep all three disposition types: apply_now, candidate_insight, discard
-- Max length: {MAX_PROMPT_CHARS} characters
-- You MUST keep the output fields for apply_now claims (actionSummary, targetSurface, impactLevel, whatThisIs, whatItMeans, whatChanges, whyNot, whyYes, signalStrength) — the production system requires them
-- Claims are formatted as XML: <claim id="..." index="..." category="...">text</claim>. The claimId instruction must reference the id attribute from <claim> tags.
+- HARD MAX: {MAX_PROMPT_CHARS} characters. Current prompt is {len(current_prompt)} chars. Aim for under {MAX_PROMPT_CHARS - 300} to leave safety margin. Proposals over {MAX_PROMPT_CHARS} are REJECTED.
+- Do NOT remove or rename sentinel strings, gate headings, or output fields listed above.
+- Claims are formatted as XML: <claim id="..." index="..." category="...">text</claim>.
 
 STRATEGY NOTES:
 - False positives (FP={current_metrics.get('fp', 0)}): The prompt classified these as apply_now but the owner skipped them. Consider tightening the apply_now criteria.
 - False negatives (FN={current_metrics.get('fn', 0)}): The prompt classified these as candidate_insight but the owner actually implemented them. Consider broadening what counts as actionable.
 - The system context section contains existing rules — claims already covered should be discard, not apply_now.
-- The "IMPORTANT" instruction about checking existing rules is critical for reducing false positives.
 - Think about what makes a claim truly actionable vs merely interesting.
-
+{research_section}
 Propose a MODIFIED prompt that you believe will achieve a HIGHER F1 score.
 Change the instruction text, criteria definitions, examples, or structure.
 Do NOT change the sentinel strings or remove required output fields.
@@ -212,9 +295,21 @@ def main():
     print(f"  Baseline accuracy:  {baseline_metrics['overall_accuracy']:.1%}")
     print(f"  Baseline wall time: {baseline_metrics['wall_time_total']:.0f}s")
 
+    # Research phase — runs once per optimization run
+    print("\nRunning research phase (targeted prompt engineering guidance)...")
+    t_research = time.time()
+    research_context = research(baseline_metrics)
+    research_time = time.time() - t_research
+    if research_context:
+        print(f"  Research completed in {research_time:.1f}s ({len(research_context)} chars)")
+    else:
+        print(f"  No research context produced ({research_time:.1f}s). Proceeding without.")
+
     if args.dry_run:
         print("\nDry run: testing proposer...")
-        proposal = propose(current_prompt, baseline_metrics, [])
+        if research_context:
+            print(f"\n  Research context preview:\n{research_context[:500]}...\n")
+        proposal = propose(current_prompt, baseline_metrics, [], research_context)
         valid, reason = validate_prompt(proposal)
         print(f"  Proposal valid: {valid} ({reason})")
         print(f"  Proposal length: {len(proposal)} chars")
@@ -247,7 +342,7 @@ def main():
         print("Proposing new prompt...")
         t_propose = time.time()
         try:
-            proposal = propose(best_prompt, baseline_metrics if iter_num == 1 else history[-1].get("metrics", baseline_metrics), history)
+            proposal = propose(best_prompt, baseline_metrics if iter_num == 1 else history[-1].get("metrics", baseline_metrics), history, research_context)
         except Exception as e:
             consecutive_proposer_failures += 1
             backoff_times = {1: 60, 2: 120, 3: 240}
