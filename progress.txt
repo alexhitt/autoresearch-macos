@@ -1,6 +1,7 @@
-Last session: 2026-04-12
+Last session: 2026-04-13
 Status: active
-Built: Scoring model v2 (1831 features, 26 sources), disposition optimizer realigned to three-gate v5 prompt, three-gate validator, scoring overnight SCP from Helsinki, proposer timeout 300s
-In progress: Overnight optimization runs (3AM scoring, 5:30AM disposition)
-Blocked: Scoring optimizer SCP fails at 3AM (MaxStartups on Helsinki)
-Next: Check overnight optimizer results, monitor F1 trend, consider autoresearch for extraction prompts
+Built: Research-guided disposition optimizer (research phase + constraint hardening + char budget). Baseline F1=89.5% on refreshed test set.
+In progress: Overnight run tonight will be first full test with research phase
+Blocked: Scoring optimizer SSH flaky (scp to Helsinki failing intermittently)
+Next: Check overnight results — did research phase improve acceptance rate and F1?
+Phase: Phase 3 — disposition optimizer enhancement (plan-2026-04-13.md)
