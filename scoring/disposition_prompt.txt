@@ -2,72 +2,60 @@ You are classifying research claims for an AI automation system (the "AI OS").
 
 __SYSTEM_CONTEXT__
 
-YOUR TASK: For each claim, decide whether the AI OS owner should act on it RIGHT NOW.
+YOUR TASK: For each claim, classify as "apply_now", "candidate_insight", or "discard".
 
-CRITICAL BIAS: You are severely UNDER-classifying apply_now. Most claims that relate to the owner's technology stack ARE actionable. When in doubt, choose apply_now.
+MANDATORY: You MUST classify EVERY claim using EXACTLY one of these three values: "apply_now", "candidate_insight", or "discard". NEVER output "unknown", "missing", "skip", or any other value. If unsure, choose between apply_now and candidate_insight. Failure to classify = system failure.
 
-The owner actively runs: Claude-based AI agents, Claude Agent SDK, MCP servers, Python/Node.js services, prediction/trading bots, financial ML systems, an Obsidian vault, memory/recall pipelines, an intelligence pipeline, prompt classification, NLP pipelines, and dashboards.
+The owner runs: Claude AI agents, Claude Agent SDK, MCP servers, Python/Node.js services, prediction/trading bots, financial ML, Obsidian vault, memory/recall pipelines, intelligence pipeline, prompt classification, NLP pipelines, dashboards, and security-sensitive infrastructure.
 
-THREE GATES — a claim needs all three for apply_now:
+THREE GATES — all three must pass for apply_now:
 
 1. OPERATIONAL READINESS — Does this touch the owner's technology areas?
-   - If it involves AI agents, LLMs, SDKs, security, Python, Node.js, prediction markets, financial ML, NLP, memory systems, evaluation methods, prompt engineering, or infrastructure patterns → READY.
-   - Security patterns, error handling patterns, and architectural patterns from ANY codebase are READY — the owner runs similar infrastructure and adopts external patterns.
-   - SDK/API version updates for tools the owner uses → READY.
-   - Research on markets, prediction, trading strategies, information extraction, or AI evaluation → READY.
-   - Only NOT ready if the domain is completely unrelated (robotics hardware, biotech wet labs, chip fabrication).
+   READY if it involves: AI agents, LLMs, SDKs, security, Python, Node.js, prediction markets, financial ML, NLP, memory systems, evaluation, prompt engineering, infrastructure, error handling, API changes, trading strategies, information extraction, or architectural patterns.
+   NOT READY only if completely unrelated (robotics hardware, biotech wet labs, chip fabrication).
 
-2. NOVELTY — Is this something the owner hasn't already deployed?
-   - ONLY fails this gate if the claim describes the owner's OWN already-shipped code. Signals: it names a specific file in the owner's repo, describes a PR the owner merged, or documents a feature the owner already deployed to production.
-   - External code patterns that the owner COULD adopt → novel (even if from someone else's repo).
-   - Research findings, techniques, metrics, methods → always novel unless the owner's system already implements that exact technique.
-   - New SDK versions, API methods, vulnerability disclosures → always novel.
-   - DEFAULT: novel. You need strong evidence it's already deployed to fail this gate.
+2. NOVELTY — Is this new to the owner?
+   FAILS ONLY if it describes the owner's OWN already-shipped code. Everything from external sources is novel. DEFAULT: novel.
 
-3. CONCRETE DELIVERABLE — Is there enough specificity to act?
-   - Named algorithms, metrics, divergence measures, methods → concrete.
-   - Specific API endpoints, SDK methods, version numbers → concrete.
-   - Vulnerability names, attack vectors, dependency names → concrete.
-   - Architectural patterns with defined components (e.g., "multi-layer memory with extraction and fusion stages") → concrete.
-   - Research findings stating "X outperforms Y" or "X detects Y" with a named mechanism → concrete.
-   - Descriptions of system architectures with identifiable design choices → concrete.
-   - Only fails if the claim is a vague generality with zero mechanism (e.g., "AI is improving").
+3. CONCRETE DELIVERABLE — The critical gate. Apply the BLUEPRINT TEST:
 
-EXAMPLES OF APPLY_NOW (these patterns are frequently missed):
-- A malicious dependency found in a popular NPM package → apply_now (security action)
-- Prompt injection defense research with specific attack/defense findings → apply_now
-- A memory architecture with named internal stages → apply_now (the owner builds memory systems)
-- New SDK version with named new API methods → apply_now
-- Error handling or thread management patterns from external codebases → apply_now (adoptable pattern)
-- Statistical methods for detecting market inefficiencies → apply_now (owner runs trading bots)
-- ML debiasing techniques for financial prediction → apply_now
-- Event extraction / NLP structuring methods → apply_now (owner runs NLP pipelines)
-- Research on AI evaluation reliability → apply_now (owner uses AI-as-judge)
-- Trading strategy archetypes with validated performance → apply_now
-- Findings about reward function design in AI domains → apply_now
+   "Does this claim hand me a BLUEPRINT I could implement, or a BELIEF I can only agree with?"
 
-EXAMPLES OF NOT APPLY_NOW:
-- The owner's own bugfix that is already merged and deployed → candidate_insight
-- A claim about a domain the owner has zero systems in → discard
-- Pure commentary with no technique, method, or finding → discard
+   BLUEPRINT (pass) = The claim names a specific: algorithm, method, API change, vulnerability/attack vector, code pattern with identifiable components, NLP technique (entity extraction, SVO parsing), statistical method, trading strategy with defined logic, error-handling pattern, architecture with named stages, research finding that reveals a new mechanism, or pipeline stage design.
 
-DECISION RULE: If ANY reasonable interpretation of the claim connects to the owner's systems AND it contains a specific technique/finding/pattern, classify as apply_now. The cost of missing actionable intelligence far exceeds the cost of reviewing a borderline claim.
+   BELIEF (fail) = The claim states: a design philosophy, general best practice, workflow preference, timing advice, process suggestion, or someone's personal practice described without a transferable technique. Test: could a senior engineer who already knows the domain learn something implementable from this claim? If they'd just nod and say "yeah, good practice" — it's a belief.
 
-For each claim, assign: "apply_now", "candidate_insight", or "discard".
+CLASSIFICATION:
 
-For ALL claims provide:
-- "reason": one sentence — which gate(s) passed or failed
-- "whyYes": 1-2 sentences — strongest argument FOR acting
-- "signalStrength": integer 1-10
+apply_now = All three gates pass. Contains a named, specific mechanism.
 
-For "apply_now" claims also provide:
-- "actionSummary": one sentence instruction
-- "targetSurface": one of "rules", "skills", "code", "memory", "architecture", "process"
-- "impactLevel": one of "tweak", "extend", "rethink"
-- "whatThisIs": 1-2 sentences, no jargon
-- "whatItMeans": 1-2 sentences connecting to AI OS
-- "whatChanges": 1-3 sentences on files/systems/behaviors
-- "whyNot": 1-2 sentences — strongest reason to skip
+candidate_insight = Gates 1-2 pass but Gate 3 fails. Relevant wisdom without a specific mechanism.
+
+discard = Gate 1 fails OR pure opinion with zero finding.
+
+APPLY_NOW — claims like these name specific mechanisms:
+- "Prompt injection defenses fail when injected task aligns with target task" → named attack vector
+- "Agent conditions generation on accumulated skills rather than generic pretraining" → named architecture
+- "Kalshi renamed API price fields to dollar-denominated variants" → specific API migration
+- "Errors in health checks surfaced instead of except:pass" → named code pattern
+- "Active threads bounded with MAX_ACTIVE_THREADS eviction" → named technique
+- "Coding/security improved via explicit verifiable reward functions" → named mechanism
+- "LLM system emulates Trend-Following trading logic" → named strategy architecture
+- "Chronos decomposes dialogue into SVO event tuples with datetime ranges" → named NLP method
+- "Claim checkability benefits from knowing referenced entities/events" → named pipeline stage
+- KL/JS divergence for market detection → named algorithms
+- ML debiasing for financial prediction → named technique category
+
+CANDIDATE_INSIGHT — claims like these offer wisdom without a mechanism:
+- "Making tools smaller leads to more creative combinations" → design philosophy
+- "Surfacing contextual info outperforms prescribing workflows" → general principle
+- "Adding checklist items after bugs prevents recurrence" → process advice
+- "Using different AI models for different workflow steps" → general practice
+- "Run compounding right after something breaks" → timing advice
+- "Docker-compose subcommands restricted to allowlist" → implementation detail in someone else's specific codebase without a transferable technique beyond "use allowlists" (which the owner already knows)
+- "Kieran uses model X for step Y" → personal practice, not novel technique
+
+DECISION: If the claim names a specific technique AND touches the owner's domain, classify apply_now. If it states advice a domain expert would already agree with, classify candidate_insight.
 
 <abstract>
 __ABSTRACT__
@@ -76,5 +64,20 @@ __ABSTRACT__
 Claims:
 __CLAIM_LIST__
 
-For each claim, include "claimId" matching the id attribute from the <claim> tags above.
-Respond with JSON array only. No commentary.
+For each claim, respond with a JSON object containing "claimId" matching the id attribute from the <claim> tags above, plus "disposition" set to EXACTLY one of "apply_now", "candidate_insight", or "discard".
+
+For ALL claims include:
+- "reason": one sentence — which gate(s) passed or failed
+- "whyYes": 1-2 sentences — strongest argument FOR acting
+- "signalStrength": integer 1-10
+
+For "apply_now" claims also include:
+- "actionSummary": one sentence instruction
+- "targetSurface": one of "rules", "skills", "code", "memory", "architecture", "process"
+- "impactLevel": one of "tweak", "extend", "rethink"
+- "whatThisIs": 1-2 sentences, no jargon
+- "whatItMeans": 1-2 sentences connecting to AI OS
+- "whatChanges": 1-3 sentences on files/systems/behaviors
+- "whyNot": 1-2 sentences — strongest reason to skip
+
+Respond with a JSON array only. No commentary, no markdown fences.
